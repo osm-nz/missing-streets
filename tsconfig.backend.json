@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "es2019",
+    "noEmit": true,
+    "jsx": "react-jsx"
+  },
+  "include": ["script"]
+}
