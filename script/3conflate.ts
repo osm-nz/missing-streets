@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
-import { FeatureCollection } from "geojson";
+import { FeatureCollection, MultiLineString } from "geojson";
 import {
+  ConflatedStreet,
   conflationResult,
   distanceBetween,
   linzJsonFile,
@@ -20,7 +21,12 @@ const checkIfMatches = (linzStreet: LinzStreet) => (osmStreet: OsmStreet) => {
   const namesMatch =
     osmStreet.nameCode === linzStreet.nameCode ||
     osmStreet.otherNameCodes?.includes(linzStreet.nameCode) ||
-    stripMacrons(osmStreet.nameCode) === linzStreet.nameCode;
+    // the next two checks allow the OSM feature to have macrons, even
+    // if the LINZ feature doesn't have them
+    stripMacrons(osmStreet.nameCode) === linzStreet.nameCode ||
+    osmStreet.otherNameCodes?.some(
+      (altName) => stripMacrons(altName) === linzStreet.nameCode
+    );
 
   // higher tolerance for long roads
   const closeEnough =
@@ -47,7 +53,7 @@ async function main() {
   );
 
   console.log("Confating...");
-  const missing: FeatureCollection = {
+  const missing: FeatureCollection<MultiLineString, ConflatedStreet> = {
     type: "FeatureCollection",
     features: [],
   };
@@ -81,7 +87,10 @@ async function main() {
             id: `${sector}_${i}`,
             bbox: calcBBox(linzStreet.geometry),
             geometry: linzStreet.geometry,
-            properties: { name: linzStreet.name },
+            properties: {
+              roadId: linzStreet.roadId,
+              name: linzStreet.name,
+            },
           });
         }
       }

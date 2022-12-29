@@ -21,10 +21,11 @@ aside {
 
   text-align: center;
 }
-.leaflet-popup-content button {
+
+button.nice {
   padding: 8px;
 }
-.leaflet-popup-content button:active {
+button.nice:active {
   transform: scale(0.9);
 }
 
@@ -34,4 +35,23 @@ kbd {
   background: #f2f2f2;
   font-size: 87.5%;
   color: #e83e8c;
+}
+
+.popup-text {
+  font-size: 18px;
+}
+
+dialog {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24px;
+  margin: auto;
+  z-index: 500;
+}
+
+dialog li {
+  padding: 4px;
 }

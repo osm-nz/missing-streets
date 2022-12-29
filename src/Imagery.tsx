@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import L from "leaflet";
 import { LayersControl, TileLayer, useMap } from "react-leaflet";
+import { useKeyboardShortcut } from "./util/useKeyboardShortcut";
 
 type Imagery = { name: string; url: string; attribution: string };
 
@@ -25,28 +26,24 @@ const imageryList: Imagery[] = [
   },
 ];
 
-export const Imagery: React.VFC = () => {
+export const Imagery: React.FC = () => {
   const map = useMap();
   const allLayers = useRef<L.TileLayer[]>([]);
 
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "b") {
-        const activeLayers: L.TileLayer[] = [];
-        map.eachLayer((layer) => {
-          if (layer instanceof L.TileLayer) activeLayers.push(layer);
-        });
+  const toggleImagery = useCallback(() => {
+    const activeLayers: L.TileLayer[] = [];
+    map.eachLayer((layer) => {
+      if (layer instanceof L.TileLayer) activeLayers.push(layer);
+    });
 
-        const isCarto =
-          activeLayers[0].getAttribution!() === imageryList[0].attribution;
+    const isCarto =
+      activeLayers[0].getAttribution!() === imageryList[0].attribution;
 
-        map.removeLayer(activeLayers[0]);
-        map.addLayer(isCarto ? allLayers.current[1] : allLayers.current[0]);
-      }
-    };
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  });
+    map.removeLayer(activeLayers[0]);
+    map.addLayer(isCarto ? allLayers.current[1] : allLayers.current[0]);
+  }, [map]);
+
+  useKeyboardShortcut("b", toggleImagery);
 
   return (
     <LayersControl position="topright">

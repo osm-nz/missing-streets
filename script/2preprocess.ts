@@ -37,22 +37,26 @@ async function readFromPlanet(): Promise<OsmPlanet> {
           i += 1;
           if (!(i % 100)) process.stdout.write(".");
 
-          if (item.type === "node" || !item.tags?.name) {
-            next();
-            return;
-          }
-
           const {
             name,
             old_name,
             alt_name,
             official_name,
             "not:name": not_name,
-          } = item.tags;
-          const sector = getSector(item.centroid.lat, item.centroid.lon);
-          const nameCode = getNameCode(name);
+          } = item.tags || {};
 
-          const otherNames = [];
+          // it's possible that a road has no name, but does have an old_name
+          const mainName = name || alt_name || old_name || not_name;
+
+          if (item.type === "node" || !mainName) {
+            next();
+            return;
+          }
+
+          const sector = getSector(item.centroid.lat, item.centroid.lon);
+          const nameCode = getNameCode(mainName);
+
+          const otherNames: string[] = [];
           if (old_name) otherNames.push(...old_name.split(";"));
           if (alt_name) otherNames.push(...alt_name.split(";"));
           if (official_name) otherNames.push(...official_name.split(";"));
@@ -60,8 +64,8 @@ async function readFromPlanet(): Promise<OsmPlanet> {
 
           const street: OsmStreet = {
             wayId: item.id,
-            name,
-            nameCode: getNameCode(name),
+            name: mainName,
+            nameCode,
             lat: item.centroid.lat,
             lng: item.centroid.lon,
           };
@@ -118,6 +122,10 @@ async function readFromLinz() {
           console.log("Invalid geometry", name);
           return;
         }
+        if (geometry.type !== "MultiLineString") {
+          console.warn("Unexpected geometry type", geometry.type);
+          return; // there's no reason why we can't allow other geometry types
+        }
 
         const [first, last] = getEnds(geometry);
         if (!first || !last) return;
@@ -136,6 +144,7 @@ async function readFromLinz() {
         const sector = firstSector; // Math.min(firstSector, lastSector);
 
         const street: LinzStreet = {
+          roadId: +item.road_id,
           name,
           nameCode: getNameCode(name),
           streetLength: distanceBetween(firstLat, firstLng, lastLat, lastLng),

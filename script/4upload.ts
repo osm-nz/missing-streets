@@ -3,14 +3,14 @@ import { config as dotenv } from "dotenv";
 import { join } from "path";
 import { conflationResult } from "./util";
 
-dotenv({ path: join(__dirname, "../.env.secret") });
+dotenv({ path: join(__dirname, "../.env.local") });
 
 async function main() {
   const { AZ_CON } = process.env;
 
   if (!AZ_CON) {
     throw new Error(
-      'You need to create a file called ".env.secret" in the root of the repository, and add the AZ_CON="..." variable'
+      'You need to create a file called ".env.local" in the root of the repository, and add the AZ_CON="..." variable'
     );
   }
 
