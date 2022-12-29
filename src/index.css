@@ -36,6 +36,10 @@ kbd {
   font-size: 87.5%;
   color: #e83e8c;
 }
+kbd a {
+  text-decoration: none;
+  color: inherit;
+}
 
 .popup-text {
   font-size: 18px;

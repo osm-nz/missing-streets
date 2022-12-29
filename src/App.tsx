@@ -68,6 +68,7 @@ export const App: React.FC = () => {
           Documentation
         </button>
         <div id="inject" />
+        <div id="inject-modal" />
       </aside>
       <MapContainer
         id="map"

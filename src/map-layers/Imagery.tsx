@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import { useCallback, useRef } from "react";
 import L from "leaflet";
 import { LayersControl, TileLayer, useMap } from "react-leaflet";
 import { useKeyboardShortcut } from "../util";

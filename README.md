@@ -5,7 +5,7 @@
 Please see [the wiki page](https://wiki.osm.org/New_Zealand/Missing_Streets) for information about this project.
 
 <details>
-<summary>Documentation for software developers</summary>
+<summary>Documentation for software developers (click to expand)</summary>
 
 Running the script:
 
@@ -24,7 +24,8 @@ Running the client:
 # first, run the script above
 yarn client:start
 
-# then visit http://localhost:3000 or http://localhost:3000/?dev (to use the local conflationResult.geo.json file)
+# then visit http://127.0.0.1:3000 or http://127.0.0.1:3000/?dev (to use the local conflationResult.geo.json file)
+# you must use 127.0.0.1 instead of localhost
 ```
 
 The client is automatically deployed to github pages.
