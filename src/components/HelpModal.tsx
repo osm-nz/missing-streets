@@ -1,5 +1,3 @@
-import React from "react";
-
 export const HelpModal: React.FC<{ onClose(): void }> = ({ onClose }) => {
   return (
     <dialog open>

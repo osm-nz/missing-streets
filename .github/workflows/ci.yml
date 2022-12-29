@@ -38,6 +38,7 @@ jobs:
           yarn client:build
         env:
           CI: true
+          REACT_APP_LDS_KEY: ${{ secrets.REACT_APP_LDS_KEY }}
 
       - name: ⚛ Deploy Client
         if: ${{ github.ref == 'refs/heads/main' }}

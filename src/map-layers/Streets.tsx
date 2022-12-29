@@ -4,7 +4,7 @@ import copy from "copy-text-to-clipboard";
 import { BBox } from "geojson";
 import { LatLngBounds, LatLngTuple, Popup as LeafletPopup } from "leaflet";
 import { Polyline, Popup, useMap, useMapEvents } from "react-leaflet";
-import { MissingStreet } from "./types";
+import { MissingStreet } from "../types";
 
 const TooBigError: React.FC<{ count: number }> = ({ count }) => (
   <div style={{ padding: 10, background: "#f2bf05", marginTop: 4 }}>

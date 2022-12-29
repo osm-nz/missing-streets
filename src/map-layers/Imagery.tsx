@@ -1,7 +1,7 @@
 import React, { useCallback, useRef } from "react";
 import L from "leaflet";
 import { LayersControl, TileLayer, useMap } from "react-leaflet";
-import { useKeyboardShortcut } from "./util/useKeyboardShortcut";
+import { useKeyboardShortcut } from "../util";
 
 type Imagery = { name: string; url: string; attribution: string };
 

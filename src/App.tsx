@@ -1,15 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { MapContainer, ScaleControl } from "react-leaflet";
-import { MapHook } from "./MapHook";
-import { Imagery } from "./Imagery";
-import { Streets } from "./Streets";
-import { WholeNetwork } from "./WholeNetwork";
+import { MapHook, Imagery, Streets, WholeNetwork } from "./map-layers";
 import type { MissingStreet } from "./types";
+import { useKeyboardShortcut } from "./util";
+import { HelpModal } from "./components";
 
 import "./index.css";
 import "leaflet/dist/leaflet.css";
-import { HelpModal } from "./HelpModal";
-import { useKeyboardShortcut } from "./util/useKeyboardShortcut";
 
 const home = (() => {
   try {
