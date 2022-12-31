@@ -13,6 +13,9 @@ type Props = {
   onClose(): void;
 };
 
+const alphabetical = ([a]: [string, unknown], [b]: [string, unknown]) =>
+  a.localeCompare(b);
+
 const QuickFixModalInner: React.FC<Props> = ({ onClose, street }) => {
   const [data, setData] = useState<Data>();
   const [chosenName, setChosenName] = useState("");
@@ -129,13 +132,16 @@ const QuickFixModalInner: React.FC<Props> = ({ onClose, street }) => {
         value={chosenName}
         onChange={(e) => setChosenName(e.target.value)}
       >
-        {Object.entries(data).map(([name, feats]) => {
-          return (
+        <option key="_" value="" disabled>
+          Select a street
+        </option>
+        {Object.entries(data)
+          .sort(alphabetical)
+          .map(([name, feats]) => (
             <option key={name} value={name}>
               {name} ({feats.length})
             </option>
-          );
-        })}
+          ))}
       </select>
       <br />
       <br />
