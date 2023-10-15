@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/missing-streets/static/css/main.ce1ca2b8.css",
-    "main.js": "/missing-streets/static/js/main.80de8cc6.js",
+    "main.css": "/missing-streets/static/css/main.29d221b0.css",
+    "main.js": "/missing-streets/static/js/main.504a70cc.js",
     "index.html": "/missing-streets/index.html",
-    "main.ce1ca2b8.css.map": "/missing-streets/static/css/main.ce1ca2b8.css.map",
-    "main.80de8cc6.js.map": "/missing-streets/static/js/main.80de8cc6.js.map"
+    "main.29d221b0.css.map": "/missing-streets/static/css/main.29d221b0.css.map",
+    "main.504a70cc.js.map": "/missing-streets/static/js/main.504a70cc.js.map"
   },
   "entrypoints": [
-    "static/css/main.ce1ca2b8.css",
-    "static/js/main.80de8cc6.js"
+    "static/css/main.29d221b0.css",
+    "static/js/main.504a70cc.js"
   ]
 }
