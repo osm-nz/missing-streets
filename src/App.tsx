@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
+import TimeAgo from "react-timeago-i18n";
 import { MapContainer, ScaleControl } from "react-leaflet";
 import { MapHook, Imagery, Streets, WholeNetwork } from "./map-layers";
 import type { MissingStreet } from "./types";
 import { useKeyboardShortcut } from "./util";
-import { HelpModal } from "./components";
+import { HelpModal, Modal } from "./components";
 
 import "./index.css";
 import "leaflet/dist/leaflet.css";
@@ -21,7 +22,9 @@ const home = (() => {
 export const App: React.FC = () => {
   const [data, setData] = useState<MissingStreet[]>();
   const [error, setError] = useState<unknown>();
+  const [lastUpdated, setLastUpdated] = useState<string>();
   const [modalOpen, setModalOpen] = useState(false);
+  const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
 
   const toggleHidden = useCallback(() => setHidden((c) => !c), []);
@@ -35,7 +38,10 @@ export const App: React.FC = () => {
         : "https://linz-addr-cdn.kyle.kiwi/missing-streets.json"
     )
       .then((r) => r.json())
-      .then((geojson) => setData(geojson.features))
+      .then((geojson) => {
+        setData(geojson.features);
+        setLastUpdated(geojson.lastUpdated);
+      })
       .catch(setError);
   }, []);
 
@@ -45,8 +51,36 @@ export const App: React.FC = () => {
   return (
     <>
       {modalOpen && <HelpModal onClose={() => setModalOpen(false)} />}
+      {infoModalOpen && (
+        <Modal onClose={() => setInfoModalOpen(false)}>
+          Running the sync is currently a manual process. If the data hasn’t
+          been updated recently,{" "}
+          <a
+            href="https://osm.org/message/new/❤️‍🔥_import"
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            send me a message on OpenStreetMap
+          </a>
+          .
+        </Modal>
+      )}
       <aside>
         <h3>Missing Streets in New Zealand</h3>
+        {lastUpdated && (
+          <small>
+            Data updated <TimeAgo date={lastUpdated} />
+            <button
+              className="small"
+              type="button"
+              onClick={() => setInfoModalOpen(true)}
+            >
+              ?
+            </button>
+          </small>
+        )}
+        <br />
+        <br />
         <button
           className="nice"
           type="button"

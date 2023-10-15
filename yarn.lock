@@ -7690,6 +7690,11 @@ react-scripts@^5.0.1:
   optionalDependencies:
     fsevents "^2.3.2"
 
+react-timeago-i18n@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-timeago-i18n/-/react-timeago-i18n-1.1.0.tgz#fe2c07601ff1a5ddb7282cae424ae430a462d830"
+  integrity sha512-3yMs87tohXNBqBxV+h0hMjaujo1H67aiDVvlBeHrXrGS8OupZAA5WQ9Yy0m8rlM8Irb38v56T0HOrKKWyNj14A==
+
 react@^18.2.0:
   version "18.2.0"
   resolved "https://registry.yarnpkg.com/react/-/react-18.2.0.tgz#555bd98592883255fa00de14f1151a917b5d77d5"

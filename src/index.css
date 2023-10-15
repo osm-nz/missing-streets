@@ -25,6 +25,11 @@ aside {
 button.nice {
   padding: 8px;
 }
+button.small {
+  padding: 0px 2px;
+  margin-left: 2px;
+}
+button.small:active,
 button.nice:active {
   transform: scale(0.9);
 }

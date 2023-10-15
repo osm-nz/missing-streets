@@ -12,7 +12,8 @@ export const Street = memo<{ street: MissingStreet }>(({ street }) => {
   const onClickEdit = useCallback(() => {
     const pos = popup.current!.getLatLng()!;
     window.open(
-      `https://www.openstreetmap.org/edit#map=18/${pos.lat}/${pos.lng}`
+      // open a fork of iD which has access to the roads overlay
+      `https://kyle.kiwi/iD#map=18/${pos.lat}/${pos.lng}`
     );
   }, []);
 

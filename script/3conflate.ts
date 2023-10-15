@@ -13,6 +13,10 @@ import {
 } from "./util";
 import { calcBBox } from "./util/calcBbox";
 
+type GeoJsonOutput = FeatureCollection<MultiLineString, ConflatedStreet> & {
+  lastUpdated: string;
+};
+
 // only used for comparing names
 const stripMacrons = (str: string) =>
   str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -53,9 +57,10 @@ async function main() {
   );
 
   console.log("Confating...");
-  const missing: FeatureCollection<MultiLineString, ConflatedStreet> = {
+  const missing: GeoJsonOutput = {
     type: "FeatureCollection",
     features: [],
+    lastUpdated: new Date().toISOString(),
   };
 
   for (const sector in linzDB) {

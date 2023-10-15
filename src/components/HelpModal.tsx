@@ -1,6 +1,8 @@
+import { Modal } from "./Modal";
+
 export const HelpModal: React.FC<{ onClose(): void }> = ({ onClose }) => {
   return (
-    <dialog open>
+    <Modal onClose={onClose}>
       <ul>
         <li>
           Press <kbd>b</kbd> to switch imagery.
@@ -12,11 +14,6 @@ export const HelpModal: React.FC<{ onClose(): void }> = ({ onClose }) => {
           Press <kbd>h</kbd> to show/hide all features.
         </li>
       </ul>
-      <form method="dialog">
-        <button className="nice" type="submit" onClick={onClose}>
-          Close
-        </button>
-      </form>
-    </dialog>
+    </Modal>
   );
 };
