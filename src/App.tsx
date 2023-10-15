@@ -66,41 +66,45 @@ export const App: React.FC = () => {
         </Modal>
       )}
       <aside>
-        <h3>Missing Streets in New Zealand</h3>
-        {lastUpdated && (
-          <small>
-            Data updated <TimeAgo date={lastUpdated} />
+        <div className="side-by-side">
+          <div>
+            <h3>Missing Streets in New Zealand</h3>
+            {lastUpdated && (
+              <small>
+                Data updated <TimeAgo date={lastUpdated} />
+                <button
+                  className="small"
+                  type="button"
+                  onClick={() => setInfoModalOpen(true)}
+                >
+                  ?
+                </button>
+              </small>
+            )}
+          </div>
+          <div>
             <button
-              className="small"
+              className="nice"
               type="button"
-              onClick={() => setInfoModalOpen(true)}
+              onClick={() => setModalOpen(true)}
             >
-              ?
+              Keyboard Shortcuts
+            </button>{" "}
+            <button
+              className="nice"
+              type="button"
+              onClick={() =>
+                window.open(
+                  "https://wiki.osm.org/New_Zealand/Missing_Streets",
+                  "_blank",
+                  "noopener noreferrer"
+                )
+              }
+            >
+              Documentation
             </button>
-          </small>
-        )}
-        <br />
-        <br />
-        <button
-          className="nice"
-          type="button"
-          onClick={() => setModalOpen(true)}
-        >
-          Keyboard Shortcuts
-        </button>{" "}
-        <button
-          className="nice"
-          type="button"
-          onClick={() =>
-            window.open(
-              "https://wiki.osm.org/New_Zealand/Missing_Streets",
-              "_blank",
-              "noopener noreferrer"
-            )
-          }
-        >
-          Documentation
-        </button>
+          </div>
+        </div>
         <div id="inject" />
         <div id="inject-modal" />
       </aside>

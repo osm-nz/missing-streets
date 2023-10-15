@@ -13,6 +13,10 @@ aside {
   height: 100px;
   text-align: center;
 }
+.side-by-side {
+  display: flex;
+  justify-content: space-between;
+}
 
 .leaflet-popup-content {
   margin: 25px !important;
