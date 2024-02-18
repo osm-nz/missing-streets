@@ -1,0 +1,49 @@
+name: Weekly Sync
+
+on:
+  schedule:
+    - cron: "6 18 * * 3"
+    # at 06:06am on Wednesday NZST. This is 2 hours
+    # after we requested an export from LINZ.
+  workflow_dispatch:
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: ⏬ Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🔢 Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: ⏬ Install
+        run: |
+          yarn
+
+      - name: 0️⃣.5️⃣ Download LINZ Export
+        run: |
+          yarn 0.5
+
+      - name: 1️⃣ Download OSM Planet file
+        run: |
+          yarn 1
+
+      - name: 2️⃣ Preprocess LINZ and OSM data
+        run: |
+          yarn 2
+
+      - name: 3️⃣ Conflate LINZ and OSM data
+        run: |
+          yarn 3
+
+      - name: 4️⃣ Upload result to CDN
+        run: |
+          yarn 4
