@@ -31,6 +31,8 @@ jobs:
       - name: 0️⃣.5️⃣ Download LINZ Export
         run: |
           yarn 0.5
+        env:
+          REACT_APP_LDS_KEY: ${{ secrets.REACT_APP_LDS_KEY }}
 
       - name: 1️⃣ Download OSM Planet file
         run: |
@@ -47,3 +49,5 @@ jobs:
       - name: 4️⃣ Upload result to CDN
         run: |
           yarn 4
+        env:
+          AZ_CON: ${{ secrets.AZ_CON }}
