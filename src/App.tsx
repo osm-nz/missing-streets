@@ -53,8 +53,8 @@ export const App: React.FC = () => {
       {modalOpen && <HelpModal onClose={() => setModalOpen(false)} />}
       {infoModalOpen && (
         <Modal onClose={() => setInfoModalOpen(false)}>
-          Running the sync is currently a manual process. If the data hasn’t
-          been updated recently,{" "}
+          Running the sync should happen automatically on Wednesday morning. If
+          the data hasn’t been updated recently,{" "}
           <a
             href="https://osm.org/message/new/❤️‍🔥_import"
             target="_blank"
