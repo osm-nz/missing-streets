@@ -32,11 +32,7 @@ export const App: React.FC = () => {
   useKeyboardShortcut("h", toggleHidden);
 
   useEffect(() => {
-    fetch(
-      window.location.search.includes("dev")
-        ? "../missing-streets/conflationResult.geo.json"
-        : "https://linz-addr-cdn.kyle.kiwi/missing-streets.json"
-    )
+    fetch("/missing-streets/conflationResult.geo.json")
       .then((r) => r.json())
       .then((geojson) => {
         setData(geojson.features);

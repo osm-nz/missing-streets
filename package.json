@@ -10,14 +10,12 @@
     "1": "sh script/1downloadPlanet.sh",
     "2": "ts-node --project tsconfig.backend.json script/2preprocess",
     "3": "ts-node --project tsconfig.backend.json script/3conflate",
-    "4": "ts-node --project tsconfig.backend.json script/4upload",
     "script": "npm run 2 && npm run 3 && npm run 4",
     "client:start": "react-scripts start",
     "client:build": "react-scripts build",
     "lint": "eslint --ext .ts,.tsx,.js --ignore-path .gitignore . && tsc"
   },
   "dependencies": {
-    "@azure/storage-blob": "^12.9.0",
     "adm-zip": "^0.5.10",
     "copy-text-to-clipboard": "^3.0.1",
     "csv-parser": "^3.0.0",
@@ -56,6 +54,7 @@
       "@typescript-eslint/no-non-null-assertion": 0
     }
   },
+  "prettier": {},
   "browserslist": [
     ">0.2%",
     "not dead",

@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  changelog:
+  sync:
     runs-on: ubuntu-latest
 
     strategy:
@@ -46,8 +46,29 @@ jobs:
         run: |
           yarn 3
 
-      - name: 4️⃣ Upload result to CDN
+      # we have to deploy the client & data together, so
+      # rebuild the client
+      - name: 🛠 Build Client
+        id: build
         run: |
-          yarn 4
+          yarn client:build
         env:
-          AZ_CON: ${{ secrets.AZ_CON }}
+          CI: true
+          REACT_APP_LDS_KEY: ${{ secrets.REACT_APP_LDS_KEY }}
+
+      - name: 🚀 Upload ./build folder
+        id: deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: 🚀 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

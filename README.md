@@ -31,7 +31,8 @@ yarn 0.5 # Downloads the LINZ export
 yarn 1
 yarn 2
 yarn 3 # generates the final file: ./public/conflationResult.geo.json
-yarn 4 # uploads the file to the CDN - requires an authentication token
+
+# finally, the results should be uploaded to the CDN. This is done by the GitHub CI
 ```
 
 Running the client:
@@ -40,7 +41,7 @@ Running the client:
 # first, run the script above
 yarn client:start
 
-# then visit http://127.0.0.1:3000 or http://127.0.0.1:3000/?dev (to use the local conflationResult.geo.json file)
+# then visit http://127.0.0.1:3000
 # you must use 127.0.0.1 instead of localhost
 ```
 
