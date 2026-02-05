@@ -1,4 +1,6 @@
-import { join } from "path";
+import { join } from "node:path";
+
+const __dirname = import.meta.dirname;
 
 export const planetRawFile = join(__dirname, "../../tmp/osm.pbf");
 export const planetJsonFile = join(__dirname, "../../tmp/osm.json");

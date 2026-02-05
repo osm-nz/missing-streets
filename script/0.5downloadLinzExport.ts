@@ -1,9 +1,9 @@
 import { promises as fs } from "node:fs";
 import { parse } from "node:path";
 import Unzip from "adm-zip";
+import { LINZ_LAYER_NAME_SUBSTR } from "../src/util";
 import { api } from "./util/api";
 import { linzRawFile } from "./util";
-import { LINZ_LAYER_NAME_SUBSTR } from "../src/util";
 
 async function main() {
   const allExports = await api.listExports();
@@ -15,7 +15,7 @@ async function main() {
         item.state !== "cancelled" &&
         item.name.includes(LINZ_LAYER_NAME_SUBSTR)
     )
-    .sort((a, b) => +new Date(b.created_at!) - +new Date(a.created_at!));
+    .toSorted((a, b) => +new Date(b.created_at!) - +new Date(a.created_at!));
 
   const mostRecent = recentExports[0];
   if (!mostRecent) {

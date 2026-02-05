@@ -79,7 +79,7 @@ export const WholeNetwork: React.FC<{
     <>
       {Object.values(fetched).map((street) => {
         const coords = street.geometry.coordinates.map((members) =>
-          members.map((latLng) => [...latLng].reverse() as LatLngTuple)
+          members.map((latLng) => latLng.toReversed() as LatLngTuple)
         );
 
         return (

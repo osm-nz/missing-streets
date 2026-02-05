@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { BBox, getMapData, OsmFeature, uploadChangeset } from "osm-api";
 import { MissingStreet } from "../types";
@@ -19,10 +19,10 @@ const alphabetical = ([a]: [string, unknown], [b]: [string, unknown]) =>
 const QuickFixModalInner: React.FC<Props> = ({ onClose, street }) => {
   const [data, setData] = useState<Data>();
   const [chosenName, setChosenName] = useState("");
-  const [addNotName, setAddNoteName] = useState(false);
+  const [addNotName, setAddNotName] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [done, setDone] = useState<number | Error>(); // changeset number or Error
-  const { user } = useContext(AuthContext);
+  const { user } = use(AuthContext);
 
   useEffect(() => {
     async function f() {
@@ -136,7 +136,7 @@ const QuickFixModalInner: React.FC<Props> = ({ onClose, street }) => {
           Select a street
         </option>
         {Object.entries(data)
-          .sort(alphabetical)
+          .toSorted(alphabetical)
           .map(([name, feats]) => (
             <option key={name} value={name}>
               {name} ({feats.length})
@@ -148,7 +148,7 @@ const QuickFixModalInner: React.FC<Props> = ({ onClose, street }) => {
       <input
         type="checkbox"
         checked={addNotName}
-        onChange={(e) => setAddNoteName(e.target.checked)}
+        onChange={(e) => setAddNotName(e.target.checked)}
       />{" "}
       Add{" "}
       <kbd>

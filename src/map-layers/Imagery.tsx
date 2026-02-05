@@ -28,7 +28,7 @@ const imageryList: Imagery[] = [
 
 export const Imagery: React.FC = () => {
   const map = useMap();
-  const allLayers = useRef<L.TileLayer[]>([]);
+  const allLayersRef = useRef<L.TileLayer[]>([]);
 
   const toggleImagery = useCallback(() => {
     const activeLayers: L.TileLayer[] = [];
@@ -40,7 +40,7 @@ export const Imagery: React.FC = () => {
       activeLayers[0].getAttribution!() === imageryList[0].attribution;
 
     map.removeLayer(activeLayers[0]);
-    map.addLayer(isCarto ? allLayers.current[1] : allLayers.current[0]);
+    map.addLayer(isCarto ? allLayersRef.current[1] : allLayersRef.current[0]);
   }, [map]);
 
   useKeyboardShortcut("b", toggleImagery);
@@ -57,7 +57,7 @@ export const Imagery: React.FC = () => {
             attribution={imagery.attribution}
             url={imagery.url}
             ref={(l) => {
-              if (l) allLayers.current[i] = l;
+              if (l) allLayersRef.current[i] = l;
             }}
           />
         </LayersControl.BaseLayer>

@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [25.x]
 
     steps:
       - name: 🛎️ Checkout
@@ -41,4 +41,3 @@ jobs:
         env:
           CI: true
           REACT_APP_LDS_KEY: ${{ secrets.REACT_APP_LDS_KEY }}
-

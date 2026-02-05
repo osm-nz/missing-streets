@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-array-for-each */
 import { BBox, Geometry } from "geojson";
 import { LatLngTuple } from "leaflet";
 

@@ -1,4 +1,5 @@
-import { promises as fs } from "fs";
+import { promises as fs } from "node:fs";
+import { dirname } from "node:path";
 import { FeatureCollection, MultiLineString } from "geojson";
 import {
   ConflatedStreet,
@@ -19,7 +20,7 @@ type GeoJsonOutput = FeatureCollection<MultiLineString, ConflatedStreet> & {
 
 // only used for comparing names
 const stripMacrons = (str: string) =>
-  str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  str.normalize("NFD").replaceAll(/[\u0300-\u036F]/g, "");
 
 const checkIfMatches = (linzStreet: LinzStreet) => (osmStreet: OsmStreet) => {
   const namesMatch =
@@ -103,6 +104,7 @@ async function main() {
   }
 
   console.log(`Saving ${missing.features.length} issues...`);
+  await fs.mkdir(dirname(conflationResult), { recursive: true });
   await fs.writeFile(conflationResult, JSON.stringify(missing, null, 2));
 }
 main();

@@ -31,7 +31,7 @@ type Props = { data: MissingStreet[]; hidden: boolean };
 export const Streets = memo<Props>(({ data, hidden }) => {
   const map = useMap();
 
-  const [bbox, setBbox] = useState<BBox>(normalBbox(map.getBounds()));
+  const [bbox, setBbox] = useState<BBox>(() => normalBbox(map.getBounds()));
 
   const onMove = useCallback(() => {
     setBbox(normalBbox(map.getBounds()));
@@ -62,3 +62,4 @@ export const Streets = memo<Props>(({ data, hidden }) => {
     </>
   );
 });
+Streets.displayName = "Streets";

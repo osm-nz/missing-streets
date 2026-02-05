@@ -45,5 +45,5 @@ export function getNameCode(name: string) {
     .replace(/saint /, "st ")
     .replace(/mount /, "mt ")
     .replace(/number /, "no ")
-    .replace(/[^A-Za-z0-9āēīōū]/g, "");
+    .replaceAll(/[^A-Za-z0-9āēīōū]/g, "");
 }

@@ -1,8 +1,9 @@
 import { join } from "node:path";
-import { config as dotenv } from "dotenv";
 import { Koordinates } from "koordinates-api";
 
-dotenv({ path: join(__dirname, "../../.env.local") });
+if (!process.env.CI) {
+  process.loadEnvFile(join(import.meta.dirname, "../../.env.local"));
+}
 
 export const api = new Koordinates({
   host: "https://data.linz.govt.nz",

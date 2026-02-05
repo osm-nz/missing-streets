@@ -7,10 +7,10 @@ import { QuickFixModal } from "../components";
 
 export const Street = memo<{ street: MissingStreet }>(({ street }) => {
   const [showQuickFixModal, setShowQuickFixModal] = useState(false);
-  const popup = useRef<LeafletPopup>(null);
+  const popupRef = useRef<LeafletPopup>(null);
 
   const onClickEdit = useCallback(() => {
-    const pos = popup.current!.getLatLng()!;
+    const pos = popupRef.current!.getLatLng()!;
     window.open(
       // open a fork of iD which has access to the roads overlay
       `https://kyle.kiwi/iD#map=18/${pos.lat}/${pos.lng}`
@@ -23,12 +23,12 @@ export const Street = memo<{ street: MissingStreet }>(({ street }) => {
   const { name } = street.properties;
 
   const coords = street.geometry.coordinates.map((members) =>
-    members.map((latLng) => [...latLng].reverse() as LatLngTuple)
+    members.map((latLng) => latLng.toReversed() as LatLngTuple)
   );
 
   return (
     <Polyline positions={coords} color="red" weight={5}>
-      <Popup ref={popup}>
+      <Popup ref={popupRef}>
         <span className="popup-text">{name}</span>
         <br />
         <button
@@ -65,3 +65,4 @@ export const Street = memo<{ street: MissingStreet }>(({ street }) => {
     </Polyline>
   );
 });
+Street.displayName = "Street";

@@ -1,4 +1,4 @@
-import { promises as fs, createReadStream } from "fs";
+import { promises as fs, createReadStream } from "node:fs";
 import csv from "csv-parser";
 import pbf2json, { Item } from "pbf2json";
 import through from "through2";
@@ -91,15 +91,12 @@ async function readFromPlanet(): Promise<OsmPlanet> {
 
 function getEnds(geometry: Geometry): [Position, Position] | [null, null] {
   if (geometry.type === "LineString") {
-    return [
-      geometry.coordinates[0],
-      geometry.coordinates[geometry.coordinates.length - 1],
-    ];
+    return [geometry.coordinates[0], geometry.coordinates.at(-1)!];
   }
   if (geometry.type === "MultiLineString") {
     // assuming the members are ordered logically
-    const x = geometry.coordinates[geometry.coordinates.length - 1];
-    return [geometry.coordinates[0][0], x[x.length - 1]];
+    const x = geometry.coordinates.at(-1)!;
+    return [geometry.coordinates[0][0], x.at(-1)!];
   }
   return [null, null];
 }

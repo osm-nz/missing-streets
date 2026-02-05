@@ -1,5 +1,5 @@
-import { Polyline } from "leaflet";
 import { memo, useEffect } from "react";
+import { Polyline } from "leaflet";
 import { useMap, useMapEvent } from "react-leaflet";
 
 // any side-effects that need access to the map context can go in here
@@ -7,15 +7,13 @@ export const MapHook = memo(() => {
   const map = useMap();
 
   useMapEvent("popupopen", (e) => {
-    // @ts-expect-error sneaky
-    // eslint-disable-next-line no-underscore-dangle
+    // @ts-expect-error --- sneaky
     const line = e.popup._source as Polyline;
     line.setStyle({ opacity: 0.3 });
   });
 
   useMapEvent("popupclose", (e) => {
-    // @ts-expect-error sneaky
-    // eslint-disable-next-line no-underscore-dangle
+    // @ts-expect-error --- sneaky
     const line = e.popup._source as Polyline;
     line.setStyle({ opacity: 1 });
   });
@@ -30,10 +28,11 @@ export const MapHook = memo(() => {
       ].join("/");
 
       localStorage.setItem("mapExtent", pos);
-    }, 5_000);
+    }, 5000);
 
     return () => clearInterval(id);
   });
 
   return null;
 });
+MapHook.displayName = "MapHook";

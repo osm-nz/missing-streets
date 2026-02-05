@@ -12,7 +12,7 @@ import "leaflet/dist/leaflet.css";
 const home = (() => {
   try {
     const [z, lat, lng] = localStorage.mapExtent.split("/").map(Number);
-    if (Number.isNaN(z + lat + lng)) throw new Error();
+    if (Number.isNaN(z + lat + lng)) throw new Error(z);
     return { z, lat, lng };
   } catch {
     return { z: 12, lat: -41.2835, lng: 174.7427 };
