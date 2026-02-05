@@ -1,14 +1,21 @@
 import { join } from "node:path";
+import type { Region } from "./types";
 
 const __dirname = import.meta.dirname;
 
-export const planetRawFile = join(__dirname, "../../tmp/osm.pbf");
-export const planetJsonFile = join(__dirname, "../../tmp/osm.json");
+export const tempFolder = join(__dirname, "../../tmp");
 
-export const linzRawFile = join(__dirname, "../../tmp/linz.csv");
-export const linzJsonFile = join(__dirname, "../../tmp/linz.json");
+export const sourceDataFile = (region: Region) =>
+  join(tempFolder, `source-data-${region.metadata.code}.json`);
 
-export const conflationResult = join(
-  __dirname,
-  "../../public/conflationResult.geo.json"
-);
+export const planetRawFile = (region: Region) =>
+  join(tempFolder, `osm-${region.metadata.code}.pbf`);
+
+export const planetJsonFile = (region: Region) =>
+  join(tempFolder, `osm-${region.metadata.code}.json`);
+
+export const conflationResult = (region: Region) =>
+  join(
+    __dirname,
+    `../../public/conflationResult-${region.metadata.code}.geo.json`
+  );

@@ -1,8 +1,12 @@
-import type { Feature, MultiLineString } from "geojson";
-import type { ConflatedStreet, RawCsvStreet } from "../script/util/types";
+import type { Feature, LineString, MultiLineString } from "geojson";
+import type { ConflatedStreet, RegionMetadata } from "../script/util/types";
+import type { RawCsvStreet } from "../script/regions/NZ/const";
 
-export type MissingStreet = Feature<MultiLineString, ConflatedStreet>;
+export type MissingStreet = Feature<
+  LineString | MultiLineString,
+  ConflatedStreet
+>;
 
 export type LinzApiStreet = Feature<MultiLineString, RawCsvStreet>;
 
-export { RawCsvStreet };
+export type { RawCsvStreet, RegionMetadata };

@@ -1,11 +1,16 @@
 import { memo, useCallback, useRef, useState } from "react";
 import copy from "copy-text-to-clipboard";
-import { LatLngTuple, Popup as LeafletPopup } from "leaflet";
+import { Popup as LeafletPopup, type LatLngExpression } from "leaflet";
 import { Polyline, Popup } from "react-leaflet";
-import { MissingStreet } from "../types";
+import { MissingStreet, type RegionMetadata } from "../types";
 import { QuickFixModal } from "../components";
 
-export const Street = memo<{ street: MissingStreet }>(({ street }) => {
+interface Props {
+  region: RegionMetadata;
+  street: MissingStreet;
+}
+
+export const Street = memo<Props>(({ region, street }) => {
   const [showQuickFixModal, setShowQuickFixModal] = useState(false);
   const popupRef = useRef<LeafletPopup>(null);
 
@@ -18,12 +23,22 @@ export const Street = memo<{ street: MissingStreet }>(({ street }) => {
   }, []);
 
   // will never happen, just to keep TS happy
-  if (street.geometry.type !== "MultiLineString") return null;
+  if (
+    street.geometry.type !== "MultiLineString" &&
+    street.geometry.type !== "LineString"
+  ) {
+    return null;
+  }
 
   const { name } = street.properties;
 
-  const coords = street.geometry.coordinates.map((members) =>
-    members.map((latLng) => latLng.toReversed() as LatLngTuple)
+  const coordsRaw =
+    street.geometry.type === "LineString"
+      ? [street.geometry.coordinates]
+      : street.geometry.coordinates;
+
+  const coords = coordsRaw.map((members) =>
+    members.map((latLng) => latLng.toReversed() as LatLngExpression)
   );
 
   return (
@@ -57,6 +72,7 @@ export const Street = memo<{ street: MissingStreet }>(({ street }) => {
         </button>
         {showQuickFixModal && (
           <QuickFixModal
+            region={region}
             street={street}
             onClose={() => setShowQuickFixModal(false)}
           />

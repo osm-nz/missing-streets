@@ -1,4 +1,4 @@
-import { MultiLineString } from "geojson";
+import { MultiLineString, type LineString } from "geojson";
 
 export type BaseStreet = {
   name: string;
@@ -17,22 +17,14 @@ export type OsmPlanet = {
   };
 };
 
-export type LinzStreet = BaseStreet & {
+export type SourceDataStreet = BaseStreet & {
   roadId: number;
-  geometry: MultiLineString;
+  geometry: MultiLineString | LineString;
   streetLength: number;
 };
 
-export type LinzPlanet = {
-  [sector: string]: LinzStreet[];
-};
-
-export type RawCsvStreet = {
-  WKT: string;
-  road_id: number;
-  full_road_name?: string;
-  /** if this field is missing, it's probably a water address */
-  road_name_type?: string;
+export type SourceData = {
+  [sector: string]: SourceDataStreet[];
 };
 
 export type Coord = [lng: number, lat: number];
@@ -42,3 +34,19 @@ export type ConflatedStreet = {
   roadId: number;
   name: string;
 };
+
+export interface RegionMetadata {
+  code: string;
+  name: string;
+  icon: string;
+  source: string;
+  centroid: { lat: number; lon: number };
+}
+
+export interface Region {
+  metadata: RegionMetadata;
+  PLANET_URL: string;
+  requestExport?(): Promise<unknown>;
+  downloadSourceData(): Promise<unknown>;
+  preprocess(): Promise<unknown>;
+}

@@ -1,9 +1,10 @@
 import { memo, useEffect } from "react";
 import { Polyline } from "leaflet";
 import { useMap, useMapEvent } from "react-leaflet";
+import type { RegionMetadata } from "../types";
 
 // any side-effects that need access to the map context can go in here
-export const MapHook = memo(() => {
+export const MapHook = memo(({ region }: { region: RegionMetadata }) => {
   const map = useMap();
 
   useMapEvent("popupopen", (e) => {
@@ -27,7 +28,7 @@ export const MapHook = memo(() => {
         map.getCenter().lng.toFixed(5),
       ].join("/");
 
-      localStorage.setItem("mapExtent", pos);
+      localStorage.setItem(`mapExtent-${region.code}`, pos);
     }, 5000);
 
     return () => clearInterval(id);

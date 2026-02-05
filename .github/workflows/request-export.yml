@@ -1,4 +1,4 @@
-name: Request LINZ Export
+name: Request Export
 
 on:
   schedule:
@@ -6,28 +6,23 @@ on:
   workflow_dispatch:
 
 jobs:
-  changelog:
+  request-export:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [25.x]
 
     steps:
       - name: ⏬ Checkout code
         uses: actions/checkout@v3
 
-      - name: 🔢 Use Node.js ${{ matrix.node-version }}
+      - name: 🔢 Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 25.x
 
       - name: ⏬ Install
         run: |
           yarn
 
-      - name: 0️⃣ Request data export from LDS
-        run: |
-          yarn 0
+      - name: 0. Request to generate an export from the source dataset
+        run: npm start "*" requestExport
         env:
           REACT_APP_LDS_KEY: ${{ secrets.REACT_APP_LDS_KEY }}

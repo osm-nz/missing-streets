@@ -1,11 +1,10 @@
 import { promises as fs } from "node:fs";
 import { parse } from "node:path";
 import Unzip from "adm-zip";
-import { LINZ_LAYER_NAME_SUBSTR } from "../src/util";
-import { api } from "./util/api";
-import { linzRawFile } from "./util";
+import { api } from "./api";
+import { linzRawFile } from "./const";
 
-async function main() {
+export async function downloadSourceData() {
   const allExports = await api.listExports();
   const recentExports = allExports
     .filter(
@@ -13,7 +12,7 @@ async function main() {
         item.created_at &&
         item.state !== "gone" &&
         item.state !== "cancelled" &&
-        item.name.includes(LINZ_LAYER_NAME_SUBSTR)
+        item.name.includes("roads-addressing")
     )
     .toSorted((a, b) => +new Date(b.created_at!) - +new Date(a.created_at!));
 
@@ -60,5 +59,3 @@ async function main() {
 
   console.log("Done!");
 }
-
-main();

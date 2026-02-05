@@ -1,14 +1,15 @@
 import { use, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { BBox, getMapData, OsmFeature, uploadChangeset } from "osm-api";
-import { MissingStreet } from "../types";
-import { calcBBox, LINZ_LAYER } from "../util";
+import { MissingStreet, type RegionMetadata } from "../types";
+import { calcBBox } from "../util";
 import { AuthGateway, AuthContext } from "../wrappers";
 import pkg from "../../package.json";
 
 type Data = Record<string, OsmFeature[]>;
 
 type Props = {
+  region: RegionMetadata;
   street: MissingStreet;
   onClose(): void;
 };
@@ -16,7 +17,7 @@ type Props = {
 const alphabetical = ([a]: [string, unknown], [b]: [string, unknown]) =>
   a.localeCompare(b);
 
-const QuickFixModalInner: React.FC<Props> = ({ onClose, street }) => {
+const QuickFixModalInner: React.FC<Props> = ({ region, onClose, street }) => {
   const [data, setData] = useState<Data>();
   const [chosenName, setChosenName] = useState("");
   const [addNotName, setAddNotName] = useState(false);
@@ -68,7 +69,7 @@ const QuickFixModalInner: React.FC<Props> = ({ onClose, street }) => {
         {
           comment: `Fix street name (${chosenName} --> ${newName})`,
           created_by: `MissingStreetsNZ v${pkg.version}`,
-          source: `https://data.linz.govt.nz/layer/${LINZ_LAYER}`,
+          source: region.source,
           host: window.location.origin + window.location.pathname,
         },
         { create: [], modify: updatedWays, delete: [] }

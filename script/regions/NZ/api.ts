@@ -2,7 +2,7 @@ import { join } from "node:path";
 import { Koordinates } from "koordinates-api";
 
 if (!process.env.CI) {
-  process.loadEnvFile(join(import.meta.dirname, "../../.env.local"));
+  process.loadEnvFile(join(import.meta.dirname, "../../../.env.local"));
 }
 
 export const api = new Koordinates({

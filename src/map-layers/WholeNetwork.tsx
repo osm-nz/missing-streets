@@ -3,7 +3,9 @@ import { Polyline, Popup, useMap } from "react-leaflet";
 import type { LatLngTuple } from "leaflet";
 import type { FeatureCollection, MultiLineString } from "geojson";
 import type { LinzApiStreet, RawCsvStreet, MissingStreet } from "../types";
-import { LINZ_LAYER, useKeyboardShortcut } from "../util";
+import { useKeyboardShortcut } from "../util";
+
+const LINZ_LAYER = 53382;
 
 type LINZQueryResp = {
   vectorQuery: {

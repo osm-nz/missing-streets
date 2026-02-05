@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/no-array-for-each */
-import { BBox, Geometry } from "geojson";
-import { LatLngTuple } from "leaflet";
+import type { BBox, Geometry } from "geojson";
+import type { LatLngTuple } from "leaflet";
 
 const [minLat, minLng, maxLat, maxLng] = [0, 1, 2, 3];
 

@@ -1,20 +1,24 @@
 import { promises as fs } from "node:fs";
 import { dirname } from "node:path";
-import { FeatureCollection, MultiLineString } from "geojson";
+import { FeatureCollection, MultiLineString, type LineString } from "geojson";
 import {
   ConflatedStreet,
   conflationResult,
   distanceBetween,
-  linzJsonFile,
-  LinzPlanet,
-  LinzStreet,
+  SourceData,
+  SourceDataStreet,
   OsmPlanet,
   OsmStreet,
   planetJsonFile,
+  sourceDataFile,
+  type Region,
 } from "./util";
 import { calcBBox } from "./util/calcBbox";
 
-type GeoJsonOutput = FeatureCollection<MultiLineString, ConflatedStreet> & {
+type GeoJsonOutput = FeatureCollection<
+  MultiLineString | LineString,
+  ConflatedStreet
+> & {
   lastUpdated: string;
 };
 
@@ -22,7 +26,8 @@ type GeoJsonOutput = FeatureCollection<MultiLineString, ConflatedStreet> & {
 const stripMacrons = (str: string) =>
   str.normalize("NFD").replaceAll(/[\u0300-\u036F]/g, "");
 
-const checkIfMatches = (linzStreet: LinzStreet) => (osmStreet: OsmStreet) => {
+// prettier-ignore
+const checkIfMatches = (linzStreet: SourceDataStreet) => (osmStreet: OsmStreet) => {
   const namesMatch =
     osmStreet.nameCode === linzStreet.nameCode ||
     osmStreet.otherNameCodes?.includes(linzStreet.nameCode) ||
@@ -46,15 +51,15 @@ const checkIfMatches = (linzStreet: LinzStreet) => (osmStreet: OsmStreet) => {
   return namesMatch && closeEnough;
 };
 
-async function main() {
-  console.log("Reading LINZ json...");
-  const linzDB: LinzPlanet = JSON.parse(
-    await fs.readFile(linzJsonFile, "utf8")
+export async function conflate(region: Region) {
+  console.log("Reading SourceData json...");
+  const linzDB: SourceData = JSON.parse(
+    await fs.readFile(sourceDataFile(region), "utf8")
   );
 
   console.log("Reading OSM json...");
   const osmDB: OsmPlanet = JSON.parse(
-    await fs.readFile(planetJsonFile, "utf8")
+    await fs.readFile(planetJsonFile(region), "utf8")
   );
 
   console.log("Confating...");
@@ -81,12 +86,8 @@ async function main() {
       }
 
       if (!possibleOsmMatches.length) {
-        // 3. If there are still no matches, do a final check if it's a state highway
-        const skip =
-          linzStreet.name.includes("State Highway") ||
-          linzStreet.name.includes("Motorway");
-
-        if (!skip) {
+        // eslint-disable-next-line unicorn/no-lonely-if, no-constant-condition
+        if (true) {
           // 4. If we get to this point, flag the street as missing
           missing.features.push({
             type: "Feature",
@@ -104,7 +105,8 @@ async function main() {
   }
 
   console.log(`Saving ${missing.features.length} issues...`);
-  await fs.mkdir(dirname(conflationResult), { recursive: true });
-  await fs.writeFile(conflationResult, JSON.stringify(missing, null, 2));
+
+  const outputFilePath = conflationResult(region);
+  await fs.mkdir(dirname(outputFilePath), { recursive: true });
+  await fs.writeFile(outputFilePath, JSON.stringify(missing, null, 2));
 }
-main();

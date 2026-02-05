@@ -3,12 +3,12 @@ import { createPortal } from "react-dom";
 import { LatLngBounds } from "leaflet";
 import { useMap, useMapEvents } from "react-leaflet";
 import { BBox } from "geojson";
-import { MissingStreet } from "../types";
+import { MissingStreet, type RegionMetadata } from "../types";
 import { Street } from "./Street";
 
 const TooBigError: React.FC<{ count: number }> = ({ count }) => (
   <div style={{ padding: 10, background: "#f2bf05", marginTop: 4 }}>
-    Zoom in to see the {count} issues in this area
+    Zoom in to see the {count.toLocaleString()} issues in this area
   </div>
 );
 
@@ -27,8 +27,12 @@ const normalBbox = (bounds: LatLngBounds): BBox => [
   bounds.getEast(), // maxLng
 ];
 
-type Props = { data: MissingStreet[]; hidden: boolean };
-export const Streets = memo<Props>(({ data, hidden }) => {
+interface Props {
+  data: MissingStreet[];
+  hidden: boolean;
+  region: RegionMetadata;
+}
+export const Streets = memo<Props>(({ data, hidden, region }) => {
   const map = useMap();
 
   const [bbox, setBbox] = useState<BBox>(() => normalBbox(map.getBounds()));
@@ -57,7 +61,7 @@ export const Streets = memo<Props>(({ data, hidden }) => {
   return (
     <>
       {visibleStreets.map((street) => (
-        <Street key={street.id} street={street} />
+        <Street key={street.id} street={street} region={region} />
       ))}
     </>
   );
