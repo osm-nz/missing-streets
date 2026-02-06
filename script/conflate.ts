@@ -62,7 +62,7 @@ export async function conflate(region: Region) {
     await fs.readFile(planetJsonFile(region), "utf8")
   );
 
-  console.log("Confating...");
+  console.log("Conflating…");
   const missing: GeoJsonOutput = {
     type: "FeatureCollection",
     features: [],

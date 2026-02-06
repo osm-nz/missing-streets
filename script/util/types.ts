@@ -46,7 +46,31 @@ export interface RegionMetadata {
 export interface Region {
   metadata: RegionMetadata;
   PLANET_URL: string;
+
+  /**
+   * Optional, if you want to transform the OSM
+   * while preprocessing the planet file
+   */
+  transformOsmName?(name: string): string;
+
+  /**
+   * Optional, if the dataset needs an export to be
+   * generated a few hours before trying to download it.
+   *
+   * This is called by a seperate CI job before the main
+   * conflation job.
+   */
   requestExport?(): Promise<unknown>;
+
+  /**
+   * region-specific code to download the dataset and
+   * store it in a temp file (usually unaltered)
+   */
   downloadSourceData(): Promise<unknown>;
+
+  /**
+   * region-specific code to convert the raw dataset
+   * into the standardised format.
+   */
   preprocess(): Promise<unknown>;
 }

@@ -38,11 +38,15 @@ export async function preprocessPlanet(region: Region) {
           } = item.tags || {};
 
           // it's possible that a road has no name, but does have an old_name
-          const mainName = name || alt_name || old_name || not_name;
+          let mainName = name || alt_name || old_name || not_name;
 
           if (item.type === "node" || !mainName) {
             next();
             return;
+          }
+
+          if (region.transformOsmName) {
+            mainName = region.transformOsmName(mainName);
           }
 
           const sector = getSector(item.centroid.lat, item.centroid.lon);

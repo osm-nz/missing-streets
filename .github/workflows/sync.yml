@@ -50,6 +50,7 @@ jobs:
         region_id:
           - NZ
           - AU_TAS
+          - US_UT
 
     steps:
       - name: ⏬ Checkout code
