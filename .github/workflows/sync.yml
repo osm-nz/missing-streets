@@ -49,6 +49,7 @@ jobs:
       matrix:
         region_id:
           - NZ
+          - AU_NSW
           - AU_TAS
           - US_UT
 
