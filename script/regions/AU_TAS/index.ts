@@ -88,7 +88,7 @@ export default {
       "https://listdata.thelist.tas.gov.au/opendata/#ds_LIST_Transport_Segments",
   },
   PLANET_URL:
-    "https://download.geofabrik.de/australia-oceania/australia-latest.osm.pbf",
+    "https://download.openstreetmap.fr/extracts/oceania/australia/tasmania.osm.pbf",
 
   async downloadSourceData() {
     const fileStream = createWriteStream(rawFile);
