@@ -12,6 +12,7 @@ import {
   type SourceData,
   type SourceDataStreet,
 } from "../../util";
+import { mergeIntoMultiLineString } from "../../util/mergeIntoMultiLineString";
 
 export const rawFile = join(tempFolder, "tmp-AU_TAS.geo.jsonl");
 
@@ -172,6 +173,10 @@ export default {
       count++;
     });
     await new Promise((resolve) => rl.on("close", resolve));
+
+    for (const sector in out) {
+      out[sector] = mergeIntoMultiLineString(out[sector]);
+    }
 
     console.log(`Processed ${count.toLocaleString()} roads`);
 
