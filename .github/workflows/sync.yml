@@ -51,6 +51,7 @@ jobs:
           - NZ
           - AU_NSW
           - AU_TAS
+          - AU_VIC
           - US_UT
 
     steps:
