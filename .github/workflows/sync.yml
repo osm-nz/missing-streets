@@ -49,6 +49,7 @@ jobs:
       matrix:
         region_id:
           - NZ
+          - AU_TAS
 
     steps:
       - name: ⏬ Checkout code
