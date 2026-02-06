@@ -33,6 +33,9 @@ jobs:
         env:
           CI: true
 
+      - name: 🧪 Unit tests
+        run: yarn test
+
       # this is just to check that it compiles
       # the result is not deployed from here
       - name: 🛠 Build Client

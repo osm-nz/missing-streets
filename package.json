@@ -10,6 +10,7 @@
     "start": "node --max-old-space-size=12288 --import tsx script/main.ts",
     "client:start": "vite",
     "client:build": "vite build",
+    "test": "vitest",
     "lint": "eslint . && tsc"
   },
   "dependencies": {
@@ -44,7 +45,8 @@
     "eslint-config-kyle": "^27.0.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18"
   },
   "prettier": {
     "singleQuote": false,
