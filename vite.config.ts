@@ -7,4 +7,5 @@ export default defineConfig({
   build: {
     outDir: "build",
   },
+  envPrefix: "REACT_APP_",
 });

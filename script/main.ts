@@ -1,6 +1,6 @@
 import { conflate } from "./conflate";
 import { downloadPlanet } from "./downloadPlanet";
-import { preprocessPlanet } from "./2preprocess";
+import { preprocessPlanet } from "./preprocessPlanet";
 import { REGIONS } from "./regions";
 
 const COMMANDS = <const>[
