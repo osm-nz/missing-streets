@@ -66,9 +66,6 @@ export const App: React.FC = () => {
       .catch(setError);
   }, [region]);
 
-  if (error) return <>Failed to load list of missing streets.</>;
-  if (!data) return <>Loading {region.name}…</>;
-
   return (
     <>
       {modalOpen && (
@@ -114,6 +111,7 @@ export const App: React.FC = () => {
                   )!;
                   setRegion(newRegion);
                   setData(undefined);
+                  setError(undefined);
                 }}
               >
                 {REGION_METADATA.map((item) => (
@@ -162,22 +160,30 @@ export const App: React.FC = () => {
         <div id="inject" />
         <div id="inject-modal" />
       </aside>
-      <MapContainer
-        id="map"
-        center={[home.lat, home.lon]}
-        zoom={home.z}
-        scrollWheelZoom
-        zoomSnap={0}
-        zoomDelta={0.2}
-      >
-        <ScaleControl position="bottomleft" />
-        <MapHook region={region} />
-        <Imagery />
-        <Streets data={data} hidden={hidden} region={region} />
-        {region.code === "NZ" && (
-          <WholeNetwork missingStreets={data} hidden={hidden} />
-        )}
-      </MapContainer>
+      {error ? (
+        <div style={{ padding: 10, background: "#f30", marginTop: 4 }}>
+          Failed to load list of missing streets.
+        </div>
+      ) : data ? (
+        <MapContainer
+          id="map"
+          center={[home.lat, home.lon]}
+          zoom={home.z}
+          scrollWheelZoom
+          zoomSnap={0}
+          zoomDelta={0.2}
+        >
+          <ScaleControl position="bottomleft" />
+          <MapHook region={region} />
+          <Imagery />
+          <Streets data={data} hidden={hidden} region={region} />
+          {region.code === "NZ" && (
+            <WholeNetwork missingStreets={data} hidden={hidden} />
+          )}
+        </MapContainer>
+      ) : (
+        <>Loading…</>
+      )}
     </>
   );
 };

@@ -43,7 +43,7 @@ export const Street = memo<Props>(({ region, street }) => {
 
   return (
     <Polyline positions={coords} color="red" weight={5}>
-      <Popup ref={popupRef}>
+      <Popup ref={popupRef} offset={[0, -10]}>
         <span className="popup-text">{name}</span>
         <br />
         <button
