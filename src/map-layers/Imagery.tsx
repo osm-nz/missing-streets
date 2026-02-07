@@ -1,63 +1,91 @@
-import { useCallback, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
-import { LayersControl, TileLayer, useMap } from "react-leaflet";
+import { LayersControl, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import { useKeyboardShortcut } from "../util";
+import { eliQueryPromise } from "../api/eli";
+import { ELI } from "../api/eli.def";
 
-type Imagery = { name: string; url: string; attribution: string };
-
-const imageryList: Imagery[] = [
-  {
-    name: "OpenStreetMap",
-    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    attribution:
-      '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+const DEFAULT_IMAGERY: ELI = {
+  id: "MAPNIK",
+  type: "tms",
+  name: "OpenStreetMap",
+  best: true,
+  url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  attribution: {
+    html: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
   },
-  {
-    name: "LINZ Aerial Imagery",
-    url: "https://basemaps.linz.govt.nz/v1/tiles/aerial/EPSG:3857/{z}/{x}/{y}.jpg?api=d01egend5f8dv4zcbfj6z2t7rs3",
-    attribution:
-      '<a href="https://www.linz.govt.nz/data/licensing-and-using-data/attributing-elevation-or-aerial-imagery-data">Sourced from LINZ CC-BY 4.0</a>',
-  },
-  {
-    name: "LINZ Topo50",
-    url: "https://map.cazzaserver.com/linz_topo/{z}/{x}/{y}.png",
-    attribution:
-      '<a href="https://www.linz.govt.nz/data/licensing-and-using-data/attributing-elevation-or-aerial-imagery-data">Sourced from LINZ CC-BY 4.0</a>',
-  },
-];
+};
 
 export const Imagery: React.FC = () => {
   const map = useMap();
-  const allLayersRef = useRef<L.TileLayer[]>([]);
+  const allLayersRef = useRef<
+    [latest?: L.TileLayer, secondLatest?: L.TileLayer]
+  >([]);
 
-  const toggleImagery = useCallback(() => {
-    const activeLayers: L.TileLayer[] = [];
-    map.eachLayer((layer) => {
-      if (layer instanceof L.TileLayer) activeLayers.push(layer);
-    });
+  const [imageryList, setImageryList] = useState<ELI[]>([DEFAULT_IMAGERY]);
 
-    const isCarto =
-      activeLayers[0].getAttribution!() === imageryList[0].attribution;
+  // store the 2nd-last used imagery layer
+  useMapEvents({
+    layeradd(event) {
+      if (!(event.layer instanceof L.TileLayer)) return;
+      allLayersRef.current[1] = allLayersRef.current[0];
+      allLayersRef.current[0] = event.layer;
+    },
+  });
 
-    map.removeLayer(activeLayers[0]);
-    map.addLayer(isCarto ? allLayersRef.current[1] : allLayersRef.current[0]);
+  // check every 5 seconds if the list of available layers
+  // in this location has changed.
+  useEffect(() => {
+    async function updateImagery() {
+      try {
+        const { lat, lng } = map.getCenter();
+
+        const matched = (await eliQueryPromise)([lng, lat]);
+        const updated = matched.filter(
+          (layer) => layer.type === "tms" && layer.id !== DEFAULT_IMAGERY.id
+        );
+        updated.unshift(DEFAULT_IMAGERY);
+
+        setImageryList((current) => {
+          // check if there were actually any changes to avoid
+          // pointless re-renders.
+          const oldKey = current.map((l) => l.id).join(",");
+          const newKey = updated.map((l) => l.id).join(",");
+          return oldKey === newKey ? current : updated;
+        });
+      } catch (ex) {
+        console.error(ex);
+      }
+    }
+    updateImagery();
+    const id = setInterval(updateImagery, 5000);
+    return () => clearInterval(id);
   }, [map]);
 
-  useKeyboardShortcut("b", toggleImagery);
+  // toggle between the last and 2nd-last used imagery layers
+  useKeyboardShortcut("b", () => {
+    const [latest, secondLatest] = allLayersRef.current;
+    if (!latest || !secondLatest) return;
+
+    map.removeLayer(latest);
+    map.addLayer(secondLatest);
+  });
 
   return (
     <LayersControl position="topright">
       {imageryList.map((imagery, i) => (
         <LayersControl.BaseLayer
           checked={i === 0}
-          name={imagery.name}
+          name={(imagery.best ? "⭐️ " : "") + imagery.name}
           key={imagery.name}
         >
           <TileLayer
-            attribution={imagery.attribution}
-            url={imagery.url}
+            attribution={imagery.attribution?.html || imagery.attribution?.text}
+            url={imagery.url
+              .replace("{zoom}", "{z}")
+              .replace(/{switch:([^}]+)}/, (_, m) => m.split(",")[0])}
             ref={(l) => {
-              if (l) allLayersRef.current[i] = l;
+              if (l) allLayersRef.current[0] ||= l;
             }}
           />
         </LayersControl.BaseLayer>

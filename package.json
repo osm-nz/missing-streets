@@ -29,7 +29,8 @@
     "react-timeago-i18n": "^1.1.0",
     "shpjs": "^6.2.0",
     "through2": "^4.0.2",
-    "wellknown": "^0.5.0"
+    "wellknown": "^0.5.0",
+    "which-polygon": "^2.2.1"
   },
   "devDependencies": {
     "@types/adm-zip": "^0.5.5",
@@ -42,6 +43,7 @@
     "@types/shpjs": "^3.4.7",
     "@types/through2": "^2.0.38",
     "@types/wellknown": "^0.5.4",
+    "@types/which-polygon": "^2.2.5",
     "@vitejs/plugin-react": "^5.1.3",
     "eslint": "^9.39.2",
     "eslint-config-kyle": "^27.0.2",

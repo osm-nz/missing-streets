@@ -1,12 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useEffectEvent } from "react";
 
-/** @param cb must be memorized */
 export const useKeyboardShortcut = (key: string, cb: () => void) => {
+  const cb_stable = useEffectEvent(cb);
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === key) cb();
+      if (e.key === key) cb_stable();
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [key, cb]);
+  }, [key]);
 };

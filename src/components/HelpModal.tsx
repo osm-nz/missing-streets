@@ -8,16 +8,19 @@ export const HelpModal: React.FC<{
   return (
     <Modal onClose={onClose}>
       <ul>
-        {region.code === "NZ" && (
-          <li>
-            Press <kbd>b</kbd> to switch imagery.
-          </li>
-        )}
-        {region.code === "NZ" && (
-          <li>
-            Press <kbd>n</kbd> to show all roads in the area.
-          </li>
-        )}
+        <li>
+          Press <kbd>b</kbd> to switch between the two most recently used
+          imagery layers.
+        </li>
+        <li
+          style={
+            region.code === "NZ"
+              ? {}
+              : { textDecoration: "line-through", color: "grey" }
+          }
+        >
+          Press <kbd>n</kbd> to show all roads in the area.
+        </li>
         <li>
           Press <kbd>h</kbd> to show/hide all features.
         </li>
