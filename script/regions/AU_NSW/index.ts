@@ -52,6 +52,7 @@ export default {
     centroid: { lat: -33.85, lon: 151.21 },
     source:
       "https://portal.spatial.nsw.gov.au/portal/home/webmap/viewer.html?useExisting=1&layers=66fabd8c23074ecc85883e0086419adc",
+    defaultImagery: "NSW_LPI_BaseMap",
   },
   PLANET_URL:
     "https://download.geofabrik.de/australia-oceania/australia-latest.osm.pbf",
