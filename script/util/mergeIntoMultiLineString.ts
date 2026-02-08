@@ -8,7 +8,8 @@ import type { SourceDataStreet } from "./types";
  *
  * Currently this assumes that a road name can only exist once
  * per sector, which is a poor assumption.
- * TODO: optimise with distance-based clustering
+ * But it makes no difference to the FE, the total number of
+ * issues will just be slightly too low.
  */
 export function mergeIntoMultiLineString(
   sector: SourceDataStreet[]

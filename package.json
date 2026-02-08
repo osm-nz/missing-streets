@@ -19,6 +19,7 @@
     "copy-text-to-clipboard": "^3.0.1",
     "csv-parser": "^3.0.0",
     "get-region": "^0.0.0",
+    "h3-js": "^4.4.0",
     "koordinates-api": "^0.0.0",
     "leaflet": "^1.9.4",
     "osm-api": "^3.3.2",

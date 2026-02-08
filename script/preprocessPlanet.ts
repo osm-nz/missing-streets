@@ -52,7 +52,11 @@ export async function preprocessPlanet(region: Region) {
             mainName = region.transformOsmName(mainName);
           }
 
-          const sector = getSector(item.centroid.lat, item.centroid.lon);
+          const sector = getSector(
+            item.centroid.lat,
+            item.centroid.lon,
+            region
+          );
           const nameCode = getNameCode(mainName);
 
           const otherNames: string[] = [];

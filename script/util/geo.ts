@@ -1,4 +1,6 @@
-import type { Geometry, Position } from "geojson";
+import type { Geometry } from "geojson";
+import { latLngToCell } from "h3-js";
+import type { Region } from "./types";
 
 const { sin, cos, sqrt, PI: π, atan2 } = Math;
 
@@ -24,19 +26,19 @@ export function distanceBetween(
   return 1000 * R * c;
 }
 
-/** measured in units of lat/lon */
-// higher values will make the script faster, but causes more
-// false-positives for roads that cross a boundary
-const SECTOR_SIZE = 2;
+const DEFAULT_SECTOR_RESOLUTION = 3;
 
 /**
  * for performance reasons, we split the datasets into "sectors" and
- * process each sector at a time.
+ * process each sector at a time. The sector size can be tuned for
+ * each region.
  */
-export function getSector(lat: number, lng: number): string {
-  const column = Math.trunc(lng * SECTOR_SIZE);
-  const row = Math.trunc(lat * SECTOR_SIZE);
-  return `${column},${row}`;
+export function getSector(lat: number, lng: number, region: Region) {
+  return latLngToCell(
+    lat,
+    lng,
+    region.sectorResolution ?? DEFAULT_SECTOR_RESOLUTION
+  );
 }
 
 export function getNameCode(name: string) {
@@ -48,37 +50,29 @@ export function getNameCode(name: string) {
     .replaceAll(/[^A-Za-z0-9āēīōū]/g, "");
 }
 
-/** returns the first & last points of a linear geojson feature */
-export function getEnds(
-  geometry: Geometry
-): [Position, Position] | [null, null] {
-  if (geometry.type === "LineString") {
-    return [geometry.coordinates[0], geometry.coordinates.at(-1)!];
+export function processGeoJson(geometry: Geometry, region: Region) {
+  const lines =
+    geometry.type === "LineString"
+      ? [geometry.coordinates]
+      : geometry.type === "MultiLineString"
+        ? geometry.coordinates
+        : undefined;
+  if (!lines) return undefined;
+
+  const [[[firstLng, firstLat]]] = lines;
+
+  // TODO: checking every single coordinate is a bit
+  // excessive, 17% of total execution time is spent
+  // just inside this loop. Maybe we could only check
+  // every 10th point, or only check points that are
+  // more than hexagon-diameter/some-constant metres
+  // away from the last point that we checked?
+  const sectors = new Set<string>();
+  for (const line of lines) {
+    for (const [lon, lat] of line) {
+      sectors.add(getSector(lat, lon, region));
+    }
   }
-  if (geometry.type === "MultiLineString") {
-    // assuming the members are ordered logically
-    const x = geometry.coordinates.at(-1)!;
-    return [geometry.coordinates[0][0], x.at(-1)!];
-  }
-  return [null, null];
-}
 
-export function processGeoJson(geometry: Geometry) {
-  const [first, last] = getEnds(geometry);
-  if (!first || !last) return undefined;
-
-  const [firstLng, firstLat] = first;
-  const [lastLng, lastLat] = last;
-
-  const [firstSector, lastSector] = [
-    getSector(firstLat, firstLng),
-    getSector(lastLat, lastLng),
-  ];
-
-  if (firstSector !== lastSector) return undefined; // TEMP: skip big roads. TODO: revist this.
-
-  // when processing a street that exists in two sectors: add it to the smallest sector.
-  const sector = firstSector; // Math.min(firstSector, lastSector);
-
-  return { sector, firstLat, firstLng, lastLat, lastLng };
+  return { sectors, firstLat, firstLng };
 }

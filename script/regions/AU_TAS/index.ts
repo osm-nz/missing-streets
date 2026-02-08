@@ -154,9 +154,9 @@ export default {
       const name = road.properties.PRI_NAME;
       if (!name) return;
 
-      const parsed = processGeoJson(road.geometry);
+      const parsed = processGeoJson(road.geometry, this);
       if (!parsed) return; // skip invalid
-      const { sector, firstLat, firstLng } = parsed;
+      const { sectors, firstLat, firstLng } = parsed;
 
       const street: SourceDataStreet = {
         roadId: road.properties.TRANSEG_ID,
@@ -168,8 +168,10 @@ export default {
         lng: firstLng,
       };
 
-      out[sector] ||= [];
-      out[sector].push(street);
+      for (const sector of sectors) {
+        out[sector] ||= [];
+        out[sector].push(street);
+      }
       count++;
     });
     await new Promise((resolve) => rl.on("close", resolve));

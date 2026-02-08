@@ -69,6 +69,9 @@ export async function conflate(region: Region) {
     lastUpdated: new Date().toISOString(),
   };
 
+  const foundRoadIds = new Set<number>();
+  const missingRoadIds = new Set<number>();
+
   for (const sector in linzDB) {
     const allLinz = linzDB[sector];
     const osmGrouped = osmDB[sector] || {};
@@ -85,10 +88,17 @@ export async function conflate(region: Region) {
         possibleOsmMatches = allOsm.filter(checkIfMatches(linzStreet));
       }
 
-      if (!possibleOsmMatches.length) {
-        // eslint-disable-next-line unicorn/no-lonely-if, no-constant-condition
-        if (true) {
+      if (possibleOsmMatches.length) {
+        // we found a match. Store all the matches, in case this is
+        // a long feature and we encounter it again in another sector
+        foundRoadIds.add(linzStreet.roadId);
+      } else {
+        if (
+          !foundRoadIds.has(linzStreet.roadId) &&
+          !missingRoadIds.has(linzStreet.roadId)
+        ) {
           // 4. If we get to this point, flag the street as missing
+          missingRoadIds.add(linzStreet.roadId);
           missing.features.push({
             type: "Feature",
             id: `${sector}_${i}`,
@@ -103,6 +113,14 @@ export async function conflate(region: Region) {
       }
     }
   }
+
+  // for long roads that appear in multiple sectors,
+  // remove them if we already found a perfect match
+  // in a different sector, or if they were already
+  // reported by a different sector.
+  missing.features = missing.features.filter(
+    (f) => !foundRoadIds.has(f.properties.roadId)
+  );
 
   console.log(`Saving ${missing.features.length} issues...`);
 

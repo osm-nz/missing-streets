@@ -40,9 +40,11 @@ export async function preprocess(this: Region) {
           name.includes("State Highway") || name.includes("Motorway");
         if (skip) return;
 
-        const parsed = processGeoJson(geometry);
+        const parsed = processGeoJson(geometry, this);
         if (!parsed) return; // skip invalid
-        const { sector, firstLat, firstLng, lastLat, lastLng } = parsed;
+        const { sectors, firstLat, firstLng } = parsed;
+
+        const [lastLng, lastLat] = geometry.coordinates.at(-1)!.at(-1)!;
 
         /** shortest path between start and end */
         const streetLength = distanceBetween(
@@ -62,8 +64,10 @@ export async function preprocess(this: Region) {
           lng: firstLng,
         };
 
-        out[sector] ||= [];
-        out[sector].push(street);
+        for (const sector of sectors) {
+          out[sector] ||= [];
+          out[sector].push(street);
+        }
       })
       .on("end", () => {
         console.log("Finished LINZ csv");

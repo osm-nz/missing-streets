@@ -161,9 +161,9 @@ export default {
         .replace(/\b([NSWE]|Ex)$/, (_, g) => ABBREVIATIONS[g]) // cardinal suffixes
         .replace(" - ", "-"); // hyphenated names
 
-      const parsed = processGeoJson(road.geometry);
+      const parsed = processGeoJson(road.geometry, this);
       if (!parsed) return; // skip invalid
-      const { sector, firstLat, firstLng } = parsed;
+      const { sectors, firstLat, firstLng } = parsed;
 
       const street: SourceDataStreet = {
         roadId: road.properties.OBJECTID,
@@ -175,8 +175,10 @@ export default {
         lng: firstLng,
       };
 
-      out[sector] ||= [];
-      out[sector].push(street);
+      for (const sector of sectors) {
+        out[sector] ||= [];
+        out[sector].push(street);
+      }
     });
 
     await new Promise((resolve) => rl.on("close", resolve));

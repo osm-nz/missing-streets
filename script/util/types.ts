@@ -50,6 +50,12 @@ export interface Region {
   PLANET_URL: string;
 
   /**
+   * Optional, the resolution for generating sectors
+   * with https://h3geo.org
+   */
+  sectorResolution?: number;
+
+  /**
    * Optional, if you want to transform the OSM
    * while preprocessing the planet file
    */

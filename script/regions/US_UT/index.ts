@@ -172,9 +172,9 @@ export default {
         if (name === "Driveway") return;
         if (SKIP.test(name)) return;
 
-        const parsed = processGeoJson(road.geometry);
+        const parsed = processGeoJson(road.geometry, this);
         if (!parsed) return; // skip invalid
-        const { sector, firstLat, firstLng } = parsed;
+        const { sectors, firstLat, firstLng } = parsed;
 
         const line =
           road.geometry.type === "MultiLineString"
@@ -192,8 +192,10 @@ export default {
           lng: firstLng,
         };
 
-        out[sector] ||= [];
-        out[sector].push(street);
+        for (const sector of sectors) {
+          out[sector] ||= [];
+          out[sector].push(street);
+        }
         i++;
       });
       parser.on("end", resolve);
