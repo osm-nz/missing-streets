@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { normaliseStreetName } from "../normaliseStreetName";
+import {
+  hasAnyStreetNameSuffixes,
+  normaliseStreetName,
+} from "../normaliseStreetName";
 
 describe(normaliseStreetName, () => {
   it.each`
@@ -11,5 +14,12 @@ describe(normaliseStreetName, () => {
     ${"S St Johns St"}        | ${"South Street Johns Street" /* TODO: fix this */}
   `("converts $input to $output", ({ input, output }) => {
     expect(normaliseStreetName(input, true)).toBe(output);
+  });
+});
+
+describe(hasAnyStreetNameSuffixes, () => {
+  it("works", () => {
+    expect(hasAnyStreetNameSuffixes("MAIN ST")).toBe(true);
+    expect(hasAnyStreetNameSuffixes("SLC HIGH SCHOOL")).toBe(false);
   });
 });

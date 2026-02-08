@@ -33,7 +33,7 @@ const ABBREVIATIONS: Record<string, string> = {
   LOOP: "Loop",
   MDW: "Meadow",
   MDWS: "Meadows",
-  MHP: "Mobile Home Park",
+  // MHP: "Mobile Home Park",
   MNR: "Manor",
   PARK: "Park",
   PASS: "Pass",
@@ -87,4 +87,11 @@ export function normaliseStreetName(
     return w.toLowerCase();
   });
   return expanded.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+}
+
+export function hasAnyStreetNameSuffixes(name: string) {
+  return name
+    .toUpperCase()
+    .split(" ")
+    .some((word) => word in ABBREVIATIONS);
 }

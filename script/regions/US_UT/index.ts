@@ -3,6 +3,7 @@ import { join } from "node:path";
 import type { Feature, Geometry } from "geojson";
 import { JSONParser } from "@streamparser/json-node";
 import {
+  distanceBetween,
   getNameCode,
   processGeoJson,
   sourceDataFile,
@@ -14,7 +15,10 @@ import {
 import { curl } from "../../util/curl";
 import { mergeIntoMultiLineString } from "../../util/mergeIntoMultiLineString";
 import { getDownloadUrlFromArcgisApi } from "./arcgisDownloadApi";
-import { normaliseStreetName } from "./normaliseStreetName";
+import {
+  hasAnyStreetNameSuffixes,
+  normaliseStreetName,
+} from "./normaliseStreetName";
 
 const rawFile = join(tempFolder, "tmp-US_UT.geo.json");
 
@@ -159,7 +163,11 @@ export default {
         let name = road.properties.FULLNAME || road.properties.NAME;
         if (!name) return;
 
+        // skip things like "Caravan Park", "Cemetery", etc.
+        if (!hasAnyStreetNameSuffixes(name)) return;
+
         name = normaliseStreetName(name, true);
+        name = this.transformOsmName!(name);
 
         if (name === "Driveway") return;
         if (SKIP.test(name)) return;
@@ -168,11 +176,17 @@ export default {
         if (!parsed) return; // skip invalid
         const { sector, firstLat, firstLng } = parsed;
 
+        const line =
+          road.geometry.type === "MultiLineString"
+            ? road.geometry.coordinates
+            : [road.geometry.coordinates];
+        const [lastLng, lastLat] = line.at(-1)!.at(-1)!;
+
         const street: SourceDataStreet = {
           roadId: road.properties.OBJECTID,
           name,
           nameCode: getNameCode(name),
-          streetLength: 0, // TODO:
+          streetLength: distanceBetween(firstLat, firstLng, lastLat, lastLng),
           geometry: road.geometry,
           lat: firstLat,
           lng: firstLng,

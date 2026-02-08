@@ -35,6 +35,9 @@ export async function preprocessPlanet(region: Region) {
             alt_name,
             official_name,
             "not:name": not_name,
+
+            "name:full": name_full, // used in US_UT only
+            "alt_name:full": alt_name_full, // used in US_UT only
           } = item.tags || {};
 
           // it's possible that a road has no name, but does have an old_name
@@ -57,6 +60,8 @@ export async function preprocessPlanet(region: Region) {
           if (alt_name) otherNames.push(...alt_name.split(";"));
           if (official_name) otherNames.push(...official_name.split(";"));
           if (not_name) otherNames.push(...not_name.split(";"));
+          if (name_full) otherNames.push(...name_full.split(";"));
+          if (alt_name_full) otherNames.push(...alt_name_full.split(";"));
 
           const street: OsmStreet = {
             wayId: item.id,
