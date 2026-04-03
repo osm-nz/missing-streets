@@ -26,6 +26,7 @@ const DEFAULT_REGION =
 export const App: React.FC = () => {
   const [region, setRegion] = useState<RegionMetadata>(DEFAULT_REGION);
   const [data, setData] = useState<MissingStreet[]>();
+  const [dataBlobUrl, setDataBlobUrl] = useState<string>();
   const [error, setError] = useState<unknown>();
   const [lastUpdated, setLastUpdated] = useState<string>();
   const [modalOpen, setModalOpen] = useState(false);
@@ -58,7 +59,12 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     fetch(`/missing-streets/conflationResult-${region.code}.geo.json`)
-      .then((r) => r.json())
+      .then((r) => r.blob())
+      .then(async (blob) => {
+        setDataBlobUrl(URL.createObjectURL(blob));
+        return blob.text();
+      })
+      .then(JSON.parse)
       .then((geojson) => {
         setData(geojson.features);
         setLastUpdated(geojson.lastUpdated);
@@ -135,12 +141,17 @@ export const App: React.FC = () => {
             )}
           </div>
           <div>
+            <a href={dataBlobUrl} download={`${region.code}.geo.json`}>
+              <button className="nice" type="button" tabIndex={-1}>
+                Export to GeoJson
+              </button>
+            </a>{" "}
             <button
               className="nice"
               type="button"
               onClick={() => setModalOpen(true)}
             >
-              Keyboard Shortcuts
+              Help
             </button>{" "}
             <button
               className="nice"
