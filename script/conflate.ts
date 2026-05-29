@@ -5,21 +5,22 @@ import {
   ConflatedStreet,
   conflationResult,
   distanceBetween,
-  SourceData,
-  SourceDataStreet,
   OsmPlanet,
   OsmStreet,
   planetJsonFile,
+  SourceData,
   sourceDataFile,
+  SourceDataStreet,
   type Region,
 } from "./util";
 import { calcBBox } from "./util/calcBbox";
 
-type GeoJsonOutput = FeatureCollection<
+export type GeoJsonOutput = FeatureCollection<
   MultiLineString | LineString,
   ConflatedStreet
 > & {
   lastUpdated: string;
+  totals: { dataset: number; osm: number };
 };
 
 // only used for comparing names
@@ -67,6 +68,7 @@ export async function conflate(region: Region) {
     type: "FeatureCollection",
     features: [],
     lastUpdated: new Date().toISOString(),
+    totals: { dataset: 0, osm: 0 },
   };
 
   const foundRoadIds = new Set<number>();
@@ -76,6 +78,9 @@ export async function conflate(region: Region) {
     const allLinz = linzDB[sector];
     const osmGrouped = osmDB[sector] || {};
     const allOsm = Object.values(osmGrouped).flat();
+
+    missing.totals.dataset += allLinz.length;
+    missing.totals.osm += allOsm.length;
 
     for (const [i, linzStreet] of allLinz.entries()) {
       // 1. if we're lucky we can find an exact match within this group

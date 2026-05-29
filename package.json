@@ -8,6 +8,7 @@
   "scripts": {
     "postinstall": "node --import tsx script/extract-regions.ts",
     "start": "node --max-old-space-size=12288 --import tsx script/main.ts",
+    "stats": "node --import tsx script/generate-stats.ts",
     "client:start": "vite",
     "client:build": "vite build",
     "test": "vitest",

@@ -37,7 +37,7 @@ jobs:
         id: deployment
         uses: actions/upload-artifact@v4
         with:
-          name: conflated-FRONTEND
+          name: conflationResult-FRONTEND
           path: build/
           retention-days: 0.5
 
@@ -88,7 +88,7 @@ jobs:
         id: deployment
         uses: actions/upload-artifact@v4
         with:
-          name: conflated-${{ matrix.region_id }}
+          name: conflationResult-${{ matrix.region_id }}.geo.json
           path: public/
           retention-days: 0.5
 
@@ -101,17 +101,32 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - name: ⏬ Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🔢 Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 25.x
+
+      - name: ⏬ Install
+        run: |
+          yarn
+
       - name: 🚀 Download all artifacts
         uses: actions/download-artifact@v5
         with:
-          path: to_publish
-          pattern: conflated-*
+          path: public
+          pattern: conflationResult-*
           merge-multiple: true
+
+      - name: Calculate Stats
+        run: npm run stats
 
       - name: 🚀 Reupload merged artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: to_publish
+          path: public
           retention-days: 0.5
 
       - name: 🚀 Deploy to GitHub Pages
