@@ -12,7 +12,7 @@ export async function downloadSourceData() {
         item.created_at &&
         item.state !== "gone" &&
         item.state !== "cancelled" &&
-        item.name.includes("roads-addressing")
+        item.name.includes("addresses-roads")
     )
     .toSorted((a, b) => +new Date(b.created_at!) - +new Date(a.created_at!));
 
