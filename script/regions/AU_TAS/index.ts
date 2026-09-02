@@ -83,6 +83,8 @@ export default {
     code: "AU_TAS",
     name: "Australia – Tasmania",
     icon: "https://upload.wikimedia.org/wikipedia/commons/4/46/Flag_of_Tasmania.svg",
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/7/7a/Disused_Bucketway_Murchison_Highway_Rosebery.JPG",
     centroid: { lat: -41.18796, lon: 146.37548 },
     source:
       "https://listdata.thelist.tas.gov.au/opendata/#ds_LIST_Transport_Segments",
