@@ -12,6 +12,8 @@ import {
 } from "../../util";
 import { linzRawFile, type RawCsvStreet } from "./const";
 
+const SKIP = new Set(["Accessway", "Service Lane", "Roadway"]);
+
 export async function preprocess(this: Region) {
   const linzList = await new Promise((resolve, reject) => {
     console.log("Reading LINZ csv...");
@@ -38,7 +40,7 @@ export async function preprocess(this: Region) {
         // 3. If there are still no matches, do a final check if it's a state highway
         const skip =
           name.includes("State Highway") || name.includes("Motorway");
-        if (skip) return;
+        if (skip || SKIP.has(name)) return;
 
         const parsed = processGeoJson(geometry, this);
         if (!parsed) return; // skip invalid
