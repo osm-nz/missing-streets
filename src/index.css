@@ -18,6 +18,13 @@ aside {
   display: flex;
   justify-content: space-between;
 }
+.iframe-absolute {
+  z-index: 401;
+  position: absolute;
+  top: 8px;
+  right: 80px;
+  text-align: right;
+}
 
 .leaflet-popup-content {
   /* eslint-disable-next-line css/no-important */
@@ -61,11 +68,13 @@ dialog {
   position: fixed;
   top: 0;
   bottom: 0;
-  left: 0;
-  right: 0;
+  left: 12px;
+  right: 12px;
   padding: 24px;
   margin: auto;
   z-index: 500;
+  max-width: max(70%, 500px);
+  text-align: initial;
 }
 
 dialog li {
