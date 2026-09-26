@@ -191,8 +191,6 @@ export const App: React.FC = () => {
           center={[home.lat, home.lon]}
           zoom={home.z}
           scrollWheelZoom
-          zoomSnap={0}
-          zoomDelta={0.2}
           style={isInIframe ? { height: "100vh" } : {}}
         >
           <ScaleControl position="bottomleft" />
