@@ -13,6 +13,9 @@ import "leaflet/dist/leaflet.css";
 import { SYNC_TIME } from "./util/date";
 
 const isInIframe = window.self !== window.top;
+const skipIframeRedirect = !!new URLSearchParams(window.location.search).get(
+  "no_redirect"
+);
 
 const qsRegion = new URLSearchParams(window.location.search).get("region");
 const DEFAULT_REGION =
@@ -24,6 +27,15 @@ const DEFAULT_REGION =
   ) ||
   // fallback to the first country in the list
   REGION_METADATA[0];
+
+// the non-iframe version is no longer allowed. unless you included ?no_redirect=1 in the URL.
+if (!isInIframe && !skipIframeRedirect) {
+  window.location.replace(
+    `https://osm-nz.github.io/osm-conflation-engine/#/project/::missing_streets::${
+      DEFAULT_REGION.code
+    }`
+  );
+}
 
 export const App: React.FC = () => {
   const [region, setRegion] = useState<RegionMetadata>(DEFAULT_REGION);
