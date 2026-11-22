@@ -1,9 +1,11 @@
-import { promises as fs } from "node:fs";
+import { createReadStream, createWriteStream, promises as fs } from "node:fs";
 import { dirname } from "node:path";
+import { JSONParser } from "@streamparser/json-node";
 import { FeatureCollection, MultiLineString, type LineString } from "geojson";
 import {
   ConflatedStreet,
   conflationResult,
+  createProgressBar,
   distanceBetween,
   OsmPlanet,
   OsmStreet,
@@ -22,6 +24,8 @@ export type GeoJsonOutput = FeatureCollection<
   lastUpdated: string;
   totals: { dataset: number; osm: number };
 };
+
+type JsonEntry<T> = { key: string; value: T };
 
 // only used for comparing names
 const stripMacrons = (str: string) =>
@@ -52,59 +56,101 @@ const checkIfMatches = (linzStreet: SourceDataStreet) => (osmStreet: OsmStreet) 
   return namesMatch && closeEnough;
 };
 
+async function readJsonObject<T>(
+  filePath: string,
+  label: string,
+  onEntry: (key: string, value: T) => void
+): Promise<void> {
+  const progress = createProgressBar(label, (await fs.stat(filePath)).size);
+  progress.update(0);
+  let bytesRead = 0;
+
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const parser = new JSONParser({
+        keepStack: false,
+        paths: ["$.*"],
+      });
+      const input = createReadStream(filePath);
+
+      input.on("data", (chunk: Buffer) => {
+        bytesRead += chunk.length;
+        progress.update(bytesRead);
+      });
+      input.on("error", reject);
+      parser.on("error", reject);
+      parser.on("data", (entry: JsonEntry<T>) => {
+        onEntry(entry.key, entry.value);
+      });
+      parser.on("end", resolve);
+      input.pipe(parser);
+    });
+    progress.complete();
+  } catch (error) {
+    progress.fail();
+    throw error;
+  }
+}
+
+const writeChunk = (
+  stream: ReturnType<typeof createWriteStream>,
+  chunk: string
+) =>
+  new Promise<void>((resolve, reject) => {
+    stream.write(chunk, (error) => {
+      if (error) reject(error);
+      else resolve();
+    });
+  });
+
+const finishStream = (stream: ReturnType<typeof createWriteStream>) =>
+  new Promise<void>((resolve, reject) => {
+    stream.once("error", reject);
+    stream.end(resolve);
+  });
+
 export async function conflate(region: Region) {
-  console.log("Reading SourceData json...");
-  const linzDB: SourceData = JSON.parse(
-    await fs.readFile(sourceDataFile(region), "utf8")
+  const osmDB: OsmPlanet = {};
+  await readJsonObject<OsmPlanet[string]>(
+    planetJsonFile(region),
+    "Reading OSM data",
+    (sector, roads) => {
+      osmDB[sector] = roads;
+    }
   );
 
-  console.log("Reading OSM json...");
-  const osmDB: OsmPlanet = JSON.parse(
-    await fs.readFile(planetJsonFile(region), "utf8")
-  );
-
-  console.log("Conflating…");
-  const missing: GeoJsonOutput = {
-    type: "FeatureCollection",
-    features: [],
-    lastUpdated: new Date().toISOString(),
-    totals: { dataset: 0, osm: 0 },
-  };
-
+  const totals = { dataset: 0, osm: 0 };
   const foundRoadIds = new Set<number>();
   const missingRoadIds = new Set<number>();
+  const missingFeatures: GeoJsonOutput["features"] = [];
 
-  for (const sector in linzDB) {
-    const allLinz = linzDB[sector];
-    const osmGrouped = osmDB[sector] || {};
-    const allOsm = Object.values(osmGrouped).flat();
+  await readJsonObject<SourceData[string]>(
+    sourceDataFile(region),
+    "Conflating source data",
+    (sector, allLinz) => {
+      const osmGrouped = osmDB[sector] || {};
+      const allOsm = Object.values(osmGrouped).flat();
 
-    missing.totals.dataset += allLinz.length;
-    missing.totals.osm += allOsm.length;
+      totals.dataset += allLinz.length;
+      totals.osm += allOsm.length;
 
-    for (const [i, linzStreet] of allLinz.entries()) {
-      // 1. if we're lucky we can find an exact match within this group
-      let possibleOsmMatches = osmGrouped[linzStreet.nameCode]?.filter(
-        checkIfMatches(linzStreet)
-      );
+      for (const [i, linzStreet] of allLinz.entries()) {
+        let possibleOsmMatches = osmGrouped[linzStreet.nameCode]?.filter(
+          checkIfMatches(linzStreet)
+        );
 
-      if (!possibleOsmMatches?.length) {
-        // 2. If not, we try again by searching thru the full list.
-        possibleOsmMatches = allOsm.filter(checkIfMatches(linzStreet));
-      }
+        if (!possibleOsmMatches?.length) {
+          possibleOsmMatches = allOsm.filter(checkIfMatches(linzStreet));
+        }
 
-      if (possibleOsmMatches.length) {
-        // we found a match. Store all the matches, in case this is
-        // a long feature and we encounter it again in another sector
-        foundRoadIds.add(linzStreet.roadId);
-      } else {
-        if (
+        if (possibleOsmMatches.length) {
+          foundRoadIds.add(linzStreet.roadId);
+        } else if (
           !foundRoadIds.has(linzStreet.roadId) &&
           !missingRoadIds.has(linzStreet.roadId)
         ) {
-          // 4. If we get to this point, flag the street as missing
           missingRoadIds.add(linzStreet.roadId);
-          missing.features.push({
+          missingFeatures.push({
             type: "Feature",
             id: `${sector}_${i}`,
             bbox: calcBBox(linzStreet.geometry),
@@ -117,19 +163,39 @@ export async function conflate(region: Region) {
         }
       }
     }
-  }
-
-  // for long roads that appear in multiple sectors,
-  // remove them if we already found a perfect match
-  // in a different sector, or if they were already
-  // reported by a different sector.
-  missing.features = missing.features.filter(
-    (f) => !foundRoadIds.has(f.properties.roadId)
   );
-
-  console.log(`Saving ${missing.features.length} issues...`);
 
   const outputFilePath = conflationResult(region);
   await fs.mkdir(dirname(outputFilePath), { recursive: true });
-  await fs.writeFile(outputFilePath, JSON.stringify(missing, null, 2));
+
+  const output = createWriteStream(outputFilePath);
+  const outputProgress = createProgressBar(
+    "Writing conflation results",
+    missingFeatures.length
+  );
+  outputProgress.update(0);
+  let written = 0;
+
+  try {
+    await writeChunk(output, '{"type":"FeatureCollection","features":[');
+    for (const feature of missingFeatures) {
+      if (foundRoadIds.has(feature.properties.roadId)) continue;
+      if (written > 0) await writeChunk(output, ",");
+      await writeChunk(output, JSON.stringify(feature));
+      written++;
+      outputProgress.update(written);
+    }
+    await writeChunk(
+      output,
+      `],"lastUpdated":${JSON.stringify(new Date().toISOString())},"totals":${JSON.stringify(totals)}}\n`
+    );
+    await finishStream(output);
+    outputProgress.complete();
+  } catch (error) {
+    outputProgress.fail();
+    output.destroy();
+    throw error;
+  }
+
+  console.log(`Saved ${written.toLocaleString()} issues to ${outputFilePath}`);
 }

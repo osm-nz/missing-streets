@@ -1,8 +1,10 @@
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { Koordinates } from "koordinates-api";
 
-if (!process.env.CI) {
-  process.loadEnvFile(join(import.meta.dirname, "../../../.env.local"));
+const envFile = join(import.meta.dirname, "../../../.env.local");
+if (!process.env.CI && existsSync(envFile)) {
+  process.loadEnvFile(envFile);
 }
 
 export const api = new Koordinates({
