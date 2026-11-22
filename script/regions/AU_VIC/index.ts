@@ -108,6 +108,8 @@ export default {
     code: "AU_VIC",
     name: "Australia – Victoria",
     icon: "https://upload.wikimedia.org/wikipedia/commons/0/08/Flag_of_Victoria_%28Australia%29.svg",
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/9/9c/Dawn_on_the_great_alpine_road.jpg",
     centroid: { lat: -37.806, lon: 144.941 },
     source:
       "https://vicmap-data.maps.arcgis.com/home/item.html?id=9642c88db1284027b41a91b0abd72dfe",

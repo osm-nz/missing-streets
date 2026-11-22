@@ -39,6 +39,7 @@ export interface RegionMetadata {
   code: string;
   name: string;
   icon: string;
+  image: string;
   source: string;
   centroid: { lat: number; lon: number };
   defaultImagery?: string;

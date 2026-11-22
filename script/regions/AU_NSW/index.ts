@@ -49,6 +49,8 @@ export default {
     code: "AU_NSW",
     name: "Australia – New South Wales",
     icon: "https://upload.wikimedia.org/wikipedia/commons/0/00/Flag_of_New_South_Wales.svg",
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/8/81/Mundi_Mundi_-_panoramio.jpg",
     centroid: { lat: -33.85, lon: 151.21 },
     source:
       "https://portal.spatial.nsw.gov.au/portal/home/webmap/viewer.html?useExisting=1&layers=66fabd8c23074ecc85883e0086419adc",

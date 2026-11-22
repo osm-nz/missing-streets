@@ -12,6 +12,11 @@ import "./index.css";
 import "leaflet/dist/leaflet.css";
 import { SYNC_TIME } from "./util/date";
 
+const isInIframe = window.self !== window.top;
+const skipIframeRedirect = !!new URLSearchParams(window.location.search).get(
+  "no_redirect"
+);
+
 const qsRegion = new URLSearchParams(window.location.search).get("region");
 const DEFAULT_REGION =
   // prefer the region from the URL
@@ -22,6 +27,15 @@ const DEFAULT_REGION =
   ) ||
   // fallback to the first country in the list
   REGION_METADATA[0];
+
+// the non-iframe version is no longer allowed. unless you included ?no_redirect=1 in the URL.
+if (!isInIframe && !skipIframeRedirect) {
+  window.location.replace(
+    `https://osm-nz.github.io/osm-conflation-engine/#/project/::missing_streets::${
+      DEFAULT_REGION.code
+    }`
+  );
+}
 
 export const App: React.FC = () => {
   const [region, setRegion] = useState<RegionMetadata>(DEFAULT_REGION);
@@ -72,6 +86,32 @@ export const App: React.FC = () => {
       .catch(setError);
   }, [region]);
 
+  const buttonRow = (
+    <>
+      <a href={dataBlobUrl} download={`${region.code}.geo.json`}>
+        <button className="nice" type="button" tabIndex={-1}>
+          Export to GeoJson
+        </button>
+      </a>{" "}
+      <button className="nice" type="button" onClick={() => setModalOpen(true)}>
+        Help
+      </button>{" "}
+      <button
+        className="nice"
+        type="button"
+        onClick={() =>
+          window.open(
+            "https://wiki.osm.org/New_Zealand/Missing_Streets",
+            "_blank",
+            "noopener noreferrer"
+          )
+        }
+      >
+        Documentation
+      </button>
+    </>
+  );
+
   return (
     <>
       {modalOpen && (
@@ -91,86 +131,68 @@ export const App: React.FC = () => {
           .
         </Modal>
       )}
-      <aside>
-        <div className="side-by-side">
-          <div>
-            <h3>
-              Missing Streets in{" "}
-              <a
-                href={region.source}
-                target="_blank"
-                rel="noopener"
-                title="View data source"
-              >
-                <img
-                  src={region.icon}
-                  alt="flag"
-                  style={{ height: 20, verticalAlign: "middle" }}
-                />
-              </a>{" "}
-              <select
-                value={region.code}
-                onChange={(event) => {
-                  const regionId = event.target.value;
-                  const newRegion = REGION_METADATA.find(
-                    (item) => item.code === regionId
-                  )!;
-                  setRegion(newRegion);
-                  setData(undefined);
-                  setError(undefined);
-                }}
-              >
-                {REGION_METADATA.map((item) => (
-                  <option key={item.code} value={item.code}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-            </h3>
-            {lastUpdated && (
-              <small>
-                Data updated <TimeAgo date={lastUpdated} />
-                <button
-                  className="small"
-                  type="button"
-                  onClick={() => setInfoModalOpen(true)}
-                >
-                  ?
-                </button>
-              </small>
-            )}
-          </div>
-          <div>
-            <a href={dataBlobUrl} download={`${region.code}.geo.json`}>
-              <button className="nice" type="button" tabIndex={-1}>
-                Export to GeoJson
-              </button>
-            </a>{" "}
-            <button
-              className="nice"
-              type="button"
-              onClick={() => setModalOpen(true)}
-            >
-              Help
-            </button>{" "}
-            <button
-              className="nice"
-              type="button"
-              onClick={() =>
-                window.open(
-                  "https://wiki.osm.org/New_Zealand/Missing_Streets",
-                  "_blank",
-                  "noopener noreferrer"
-                )
-              }
-            >
-              Documentation
-            </button>
-          </div>
+      {isInIframe ? (
+        <div className="iframe-absolute">
+          {buttonRow}
+          <div id="inject" />
+          <div id="inject-modal" />
         </div>
-        <div id="inject" />
-        <div id="inject-modal" />
-      </aside>
+      ) : (
+        <aside>
+          <div className="side-by-side">
+            <div>
+              <h3>
+                Missing Streets in{" "}
+                <a
+                  href={region.source}
+                  target="_blank"
+                  rel="noopener"
+                  title="View data source"
+                >
+                  <img
+                    src={region.icon}
+                    alt="flag"
+                    style={{ height: 20, verticalAlign: "middle" }}
+                  />
+                </a>{" "}
+                <select
+                  value={region.code}
+                  onChange={(event) => {
+                    const regionId = event.target.value;
+                    const newRegion = REGION_METADATA.find(
+                      (item) => item.code === regionId
+                    )!;
+                    setRegion(newRegion);
+                    setData(undefined);
+                    setError(undefined);
+                  }}
+                >
+                  {REGION_METADATA.map((item) => (
+                    <option key={item.code} value={item.code}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </h3>
+              {lastUpdated && (
+                <small>
+                  Data updated <TimeAgo date={lastUpdated} />
+                  <button
+                    className="small"
+                    type="button"
+                    onClick={() => setInfoModalOpen(true)}
+                  >
+                    ?
+                  </button>
+                </small>
+              )}
+            </div>
+            <div>{buttonRow}</div>
+          </div>
+          <div id="inject" />
+          <div id="inject-modal" />
+        </aside>
+      )}
       {error ? (
         <div style={{ padding: 10, background: "#f30", marginTop: 4 }}>
           Failed to load list of missing streets.
@@ -181,8 +203,7 @@ export const App: React.FC = () => {
           center={[home.lat, home.lon]}
           zoom={home.z}
           scrollWheelZoom
-          zoomSnap={0}
-          zoomDelta={0.2}
+          style={isInIframe ? { height: "100vh" } : {}}
         >
           <ScaleControl position="bottomleft" />
           <MapHook region={region} />

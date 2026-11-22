@@ -122,6 +122,8 @@ export default {
     code: "US_UT",
     name: "USA – Utah",
     icon: "https://upload.wikimedia.org/wikipedia/commons/f/f6/Flag_of_Utah.svg",
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/6/60/Forrest_Gump_Point_Monument_Valley_November_2018_001.jpg",
     centroid: { lat: 40.6129, lon: -111.9026 },
     source:
       "https://arcgis.com/home/item.html?id=478fbef62481427f95a3510a4707b24a",
