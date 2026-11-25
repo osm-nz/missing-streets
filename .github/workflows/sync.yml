@@ -53,6 +53,7 @@ jobs:
           - AU_TAS
           - AU_VIC
           - US_UT
+          - GB
 
     steps:
       - name: ⏬ Checkout code
