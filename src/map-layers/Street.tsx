@@ -109,7 +109,10 @@ export const Street = memo<Props>(({ region, street }) => {
         <span className="popup-text">{name}</span>
         {street.properties.nearMatchName && (
           <div className="warning">
-            Close match to existing OSM name: <span className="nearmatchname">{street.properties.nearMatchName}</span>
+            Close match to existing OSM name:
+            <span className="nearmatchname">
+              {street.properties.nearMatchName}
+            </span>
           </div>
         )}
         <div style={{ display: "flex", gap: 4 }}>
