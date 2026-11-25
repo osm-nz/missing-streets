@@ -100,9 +100,18 @@ export const Street = memo<Props>(({ region, street }) => {
   ];
 
   return (
-    <Polyline positions={coords} color="red" weight={5}>
+    <Polyline
+      positions={coords}
+      color={street.properties.nearMatchName ? "orange" : "red"}
+      weight={5}
+    >
       <Popup ref={popupRef} offset={[0, -10]}>
         <span className="popup-text">{name}</span>
+        {street.properties.nearMatchName && (
+          <div className="warning">
+            Close match to existing OSM name: <span className="nearmatchname">{street.properties.nearMatchName}</span>
+          </div>
+        )}
         <div style={{ display: "flex", gap: 4 }}>
           <button
             className="nice"

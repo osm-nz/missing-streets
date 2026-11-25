@@ -12,6 +12,7 @@ import {
   sourceDataFile,
   SourceDataStreet,
   type Region,
+  isWithinTwoEdits,
 } from "./util";
 import { calcBBox } from "./util/calcBbox";
 
@@ -27,6 +28,15 @@ export type GeoJsonOutput = FeatureCollection<
 const stripMacrons = (str: string) =>
   str.normalize("NFD").replaceAll(/[\u0300-\u036F]/g, "");
 
+const isCloseEnough = (linzStreet: SourceDataStreet, osmStreet: OsmStreet) =>
+  distanceBetween(
+    osmStreet.lat,
+    osmStreet.lng,
+    linzStreet.lat,
+    linzStreet.lng
+  ) <
+  10_000 + 2 * linzStreet.streetLength;
+
 // prettier-ignore
 const checkIfMatches = (linzStreet: SourceDataStreet) => (osmStreet: OsmStreet) => {
   const namesMatch =
@@ -39,18 +49,18 @@ const checkIfMatches = (linzStreet: SourceDataStreet) => (osmStreet: OsmStreet) 
       (altName) => stripMacrons(altName) === linzStreet.nameCode
     );
 
-  // higher tolerance for long roads
-  const closeEnough =
-    distanceBetween(
-      osmStreet.lat,
-      osmStreet.lng,
-      linzStreet.lat,
-      linzStreet.lng
-    ) <
-    10_000 + 2 * linzStreet.streetLength;
-
-  return namesMatch && closeEnough;
+  return namesMatch && isCloseEnough(linzStreet, osmStreet);
 };
+
+const checkIfSimilarName =
+  (linzStreet: SourceDataStreet) => (osmStreet: OsmStreet) => {
+    if (!isCloseEnough(linzStreet, osmStreet)) return false;
+
+    const sourceNameCode = stripMacrons(linzStreet.nameCode);
+    return [osmStreet.nameCode, ...(osmStreet.otherNameCodes ?? [])].some(
+      (nameCode) => isWithinTwoEdits(sourceNameCode, stripMacrons(nameCode))
+    );
+  };
 
 export async function conflate(region: Region) {
   console.log("Reading SourceData json...");
@@ -72,7 +82,10 @@ export async function conflate(region: Region) {
   };
 
   const foundRoadIds = new Set<number>();
-  const missingRoadIds = new Set<number>();
+  const missingFeaturesByRoadId = new Map<
+    number,
+    GeoJsonOutput["features"][number]
+  >();
 
   for (const sector in linzDB) {
     const allLinz = linzDB[sector];
@@ -98,22 +111,34 @@ export async function conflate(region: Region) {
         // a long feature and we encounter it again in another sector
         foundRoadIds.add(linzStreet.roadId);
       } else {
-        if (
-          !foundRoadIds.has(linzStreet.roadId) &&
-          !missingRoadIds.has(linzStreet.roadId)
-        ) {
-          // 4. If we get to this point, flag the street as missing
-          missingRoadIds.add(linzStreet.roadId);
-          missing.features.push({
-            type: "Feature",
-            id: `${sector}_${i}`,
-            bbox: calcBBox(linzStreet.geometry),
-            geometry: linzStreet.geometry,
-            properties: {
-              roadId: linzStreet.roadId,
-              name: linzStreet.name,
-            },
-          });
+        if (!foundRoadIds.has(linzStreet.roadId)) {
+          const similarOsmStreet = allOsm.find(checkIfSimilarName(linzStreet));
+          const existingFeature = missingFeaturesByRoadId.get(
+            linzStreet.roadId
+          );
+
+          if (existingFeature) {
+            if (similarOsmStreet && !existingFeature.properties.nearMatchName) {
+              existingFeature.properties.nearMatchName = similarOsmStreet.name;
+            }
+          } else {
+            // 4. If we get to this point, flag the street as missing
+            const feature = {
+              type: "Feature",
+              id: `${sector}_${i}`,
+              bbox: calcBBox(linzStreet.geometry),
+              geometry: linzStreet.geometry,
+              properties: {
+                roadId: linzStreet.roadId,
+                name: linzStreet.name,
+                ...(similarOsmStreet
+                  ? { nearMatchName: similarOsmStreet.name }
+                  : {}),
+              },
+            } satisfies GeoJsonOutput["features"][number];
+            missing.features.push(feature);
+            missingFeaturesByRoadId.set(linzStreet.roadId, feature);
+          }
         }
       }
     }

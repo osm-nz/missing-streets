@@ -35,6 +35,18 @@ aside {
 
   text-align: center;
 }
+.leaflet-popup-content .warning::before {
+  content: "⚠️ ";
+}
+.leaflet-popup-content .warning {
+  font-weight: bold;
+  padding: 5px 0 15px;
+}
+.leaflet-popup-content .nearmatchname {
+  font-weight: normal;
+  display: inline-block;
+  padding-top: 5px;
+}
 
 button.nice {
   padding: 4px 7px;

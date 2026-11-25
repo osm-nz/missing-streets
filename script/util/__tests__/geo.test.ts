@@ -1,5 +1,5 @@
 import { it, describe, expect } from "vitest";
-import { getNameCode } from "../geo";
+import { getNameCode, isWithinTwoEdits } from "../geo";
 
 describe(getNameCode, () => {
   it.each`
@@ -8,5 +8,19 @@ describe(getNameCode, () => {
     ${"Kāwerau No.2 Ave"} | ${"kāwerauno2ave"}
   `("converts $input to $output", ({ input, output }) => {
     expect(getNameCode(input)).toBe(output);
+  });
+});
+
+describe(isWithinTwoEdits, () => {
+  it.each([
+    ["road", "road", true],
+    ["road", "rood", true],
+    ["road", "rd", true],
+    ["road", "roads", true],
+    ["road", "roasd", true],
+    ["road", "street", false],
+    ["rd", "street", false],
+  ])("compares %s and %s", (a, b, expected) => {
+    expect(isWithinTwoEdits(a, b)).toBe(expected);
   });
 });
