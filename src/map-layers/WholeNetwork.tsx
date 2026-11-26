@@ -26,7 +26,7 @@ export const WholeNetwork: React.FC<{
   hidden: boolean;
 }> = ({ missingStreets, hidden }) => {
   const map = useMap();
-  const [fetched, setFetched] = useState<Fetched>([]);
+  const [fetched, setFetched] = useState<Fetched>({});
 
   // object of IDs that are already shown on the map in red
   const conflatedRoadIds = useMemo(() => {
