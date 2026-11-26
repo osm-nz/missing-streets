@@ -6,6 +6,10 @@ describe(getNameCode, () => {
     input                 | output
     ${"Bob Road"}         | ${"bobroad"}
     ${"Kāwerau No.2 Ave"} | ${"kāwerauno2ave"}
+    ${"KĀWERAU AVE"}      | ${"kāwerauave"}
+    ${"Sràid an Eòrna"}   | ${"sraidaneorna"}
+    ${"Lôn Meirion"}      | ${"lonmeirion"}
+    ${"Ffordd Tŷ Gwyn"}   | ${"fforddtygwyn"}
   `("converts $input to $output", ({ input, output }) => {
     expect(getNameCode(input)).toBe(output);
   });

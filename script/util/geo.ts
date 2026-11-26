@@ -47,8 +47,12 @@ export function getNameCode(name: string) {
     .replace(/saint /, "st ")
     .replace(/mount /, "mt ")
     .replace(/number /, "no ")
+    .normalize("NFD")
+    .replaceAll(/(?!\u0304)\p{M}/gu, "") // strip all diacritics except macrons
+    .normalize("NFC") // strip all remaining characters except these
     .replaceAll(/[^A-Za-z0-9āēīōū]/g, "");
 }
+
 // Check if names are within two edits of each other, ignoring case and diacritics
 export function isWithinTwoEdits(a: string, b: string) {
   if (Math.abs(a.length - b.length) > 2) return false;
