@@ -1,3 +1,5 @@
+import { HEADERS } from "../../util";
+
 export interface ExportRequestResponse {
   message: string;
   status: "ExportingData";
@@ -19,7 +21,8 @@ export async function getDownloadUrlFromArcgisApi(
     spatialRefId: "4326",
   });
   const result: ExportRequestResponse = await fetch(
-    `https://hub.arcgis.com/api/download/v1/items/${datasetId}/geojson?${qs}`
+    `https://hub.arcgis.com/api/download/v1/items/${datasetId}/geojson?${qs}`,
+    { headers: HEADERS }
   ).then((r) => r.json());
   console.log(result.message);
 

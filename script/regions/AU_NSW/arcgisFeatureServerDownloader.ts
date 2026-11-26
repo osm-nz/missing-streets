@@ -1,5 +1,6 @@
 import { createWriteStream } from "node:fs";
 import type { FeatureCollection } from "geojson";
+import { HEADERS } from "../../util";
 
 /**
  * Makes a random request with the page size set to a
@@ -14,9 +15,9 @@ async function getPageSizeLimit(url: string) {
     f: "geojson",
     resultRecordCount: `${1e9}`,
   });
-  const result: FeatureCollection = await fetch(`${url}/query?${qs2}`).then(
-    (r) => r.json()
-  );
+  const result: FeatureCollection = await fetch(`${url}/query?${qs2}`, {
+    headers: HEADERS,
+  }).then((r) => r.json());
 
   return result.features.length;
 }
@@ -28,7 +29,8 @@ async function getPageSizeLimit(url: string) {
  */
 async function listAllObjectIds(url: string) {
   const metadata: { objectIds: number[] } = await fetch(
-    `${url}/query?${new URLSearchParams({ where: "1=1", returnIdsOnly: "true", f: "json" })}`
+    `${url}/query?${new URLSearchParams({ where: "1=1", returnIdsOnly: "true", f: "json" })}`,
+    { headers: HEADERS }
   ).then((r) => r.json());
   return metadata;
 }
@@ -74,6 +76,7 @@ export async function arcgisFeatureServerDownloader(
     const result: FeatureCollection = await fetch(`${url}/query`, {
       method: "POST",
       body: qs,
+      headers: HEADERS,
     }).then((r) => r.json());
     console.log("\tgot", result.features.length);
 

@@ -1,6 +1,10 @@
 import { join } from "node:path";
 import type { Region } from "./types";
 
+export const HEADERS = {
+  "User-Agent": "https://github.com/osm-nz/missing-streets",
+};
+
 const __dirname = import.meta.dirname;
 
 export const tempFolder = join(__dirname, "../../tmp");

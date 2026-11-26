@@ -5,6 +5,7 @@ import shp from "shpjs";
 import type { Feature, Geometry } from "geojson";
 import {
   getNameCode,
+  HEADERS,
   processGeoJson,
   sourceDataFile,
   tempFolder,
@@ -102,7 +103,8 @@ export default {
 
       // 1. download .zip into an ArrayBuffer
       const response = await fetch(
-        `https://listdata.thelist.tas.gov.au/opendata/data/LIST_TRANSPORT_SEGMENTS_${locality}.zip`
+        `https://listdata.thelist.tas.gov.au/opendata/data/LIST_TRANSPORT_SEGMENTS_${locality}.zip`,
+        { headers: HEADERS }
       );
       const buffer = await response.arrayBuffer();
 

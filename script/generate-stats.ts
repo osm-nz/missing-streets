@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { homepage } from "../package.json" with { type: "json" };
 import type { GeoJsonOutput } from "./conflate";
 import { REGIONS } from "./regions";
-import type { RegionMetadata } from "./util";
+import { HEADERS, type RegionMetadata } from "./util";
 
 //
 // this script is only designed to work in github actions
@@ -62,9 +62,9 @@ for (const fileName of fileNames) {
 //
 // add the new stats row to the existing file
 //
-const existingStats: StatsFile = await fetch(
-  `${homepage}/${STATS_FILE_NAME}`
-).then((r) => r.json());
+const existingStats: StatsFile = await fetch(`${homepage}/${STATS_FILE_NAME}`, {
+  headers: HEADERS,
+}).then((r) => r.json());
 
 existingStats.lastUpdated = newRow.date;
 existingStats.operator = `https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}#${GITHUB_ACTOR}`;
