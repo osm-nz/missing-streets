@@ -1,9 +1,13 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { LatLngBounds } from "leaflet";
 import { useMap, useMapEvents } from "react-leaflet";
 import { BBox } from "geojson";
 import { MissingStreet, type RegionMetadata } from "../types";
+import {
+  createStreetSpatialIndex,
+  getStreetCandidateIndexes,
+} from "../util/streetSpatialIndex";
 import { Street } from "./Street";
 
 const TooBigError: React.FC<{ count: number }> = ({ count }) => (
@@ -35,6 +39,7 @@ interface Props {
 export const Streets = memo<Props>(({ data, hidden, region }) => {
   const map = useMap();
 
+  const spatialIndex = useMemo(() => createStreetSpatialIndex(data), [data]);
   const [bbox, setBbox] = useState<BBox>(() => normalBbox(map.getBounds()));
 
   const onMove = useCallback(() => {
@@ -45,14 +50,15 @@ export const Streets = memo<Props>(({ data, hidden, region }) => {
 
   if (!bbox || hidden) return null;
 
-  const visibleStreets = data.filter((feature) => {
-    return (
-      feature.bbox![minLat] > bbox[minLat] &&
-      feature.bbox![maxLat] < bbox[maxLat] &&
-      feature.bbox![minLng] > bbox[minLng] &&
-      feature.bbox![maxLng] < bbox[maxLng]
+  const visibleStreets = getStreetCandidateIndexes(spatialIndex, bbox)
+    .map((index) => data[index])
+    .filter(
+      (feature) =>
+        feature.bbox![minLat] > bbox[minLat] &&
+        feature.bbox![maxLat] < bbox[maxLat] &&
+        feature.bbox![minLng] > bbox[minLng] &&
+        feature.bbox![maxLng] < bbox[maxLng]
     );
-  });
 
   if (visibleStreets.length > 200) {
     return <TooBigErrorWrapper count={visibleStreets.length} />;
