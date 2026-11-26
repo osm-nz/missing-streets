@@ -40,7 +40,6 @@ if (!isInIframe && !skipIframeRedirect) {
 export const App: React.FC = () => {
   const [region, setRegion] = useState<RegionMetadata>(DEFAULT_REGION);
   const [data, setData] = useState<MissingStreet[]>();
-  const [dataBlobUrl, setDataBlobUrl] = useState<string>();
   const [error, setError] = useState<unknown>();
   const [lastUpdated, setLastUpdated] = useState<string>();
   const [modalOpen, setModalOpen] = useState(false);
@@ -71,24 +70,34 @@ export const App: React.FC = () => {
 
   useKeyboardShortcut("h", toggleHidden);
 
+  const dataUrl = `/missing-streets/conflationResult-${region.code}.geo.json`;
+
   useEffect(() => {
-    fetch(`/missing-streets/conflationResult-${region.code}.geo.json`)
-      .then((r) => r.blob())
-      .then(async (blob) => {
-        setDataBlobUrl(URL.createObjectURL(blob));
-        return blob.text();
+    const controller = new AbortController();
+
+    fetch(dataUrl, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(
+            `Failed to load missing streets: HTTP ${response.status}`
+          );
+        }
+        return response.json();
       })
-      .then(JSON.parse)
       .then((geojson) => {
         setData(geojson.features);
         setLastUpdated(geojson.lastUpdated);
       })
-      .catch(setError);
-  }, [region]);
+      .catch((fetchError: unknown) => {
+        if (!controller.signal.aborted) setError(fetchError);
+      });
+
+    return () => controller.abort();
+  }, [dataUrl]);
 
   const buttonRow = (
     <>
-      <a href={dataBlobUrl} download={`${region.code}.geo.json`}>
+      <a href={dataUrl} download={`${region.code}.geo.json`}>
         <button className="nice" type="button" tabIndex={-1}>
           Export to GeoJson
         </button>
