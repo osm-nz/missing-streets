@@ -1,5 +1,5 @@
 import { it, describe, expect } from "vitest";
-import { getNameCode, isWithinTwoEdits } from "../geo";
+import { getNameCode, isWithinEditDistance } from "../geo";
 
 describe(getNameCode, () => {
   it.each`
@@ -15,16 +15,19 @@ describe(getNameCode, () => {
   });
 });
 
-describe(isWithinTwoEdits, () => {
+describe(isWithinEditDistance, () => {
   it.each([
-    ["road", "road", true],
-    ["road", "rood", true],
-    ["road", "rd", true],
-    ["road", "roads", true],
-    ["road", "roasd", true],
-    ["road", "street", false],
-    ["rd", "street", false],
-  ])("compares %s and %s", (a, b, expected) => {
-    expect(isWithinTwoEdits(a, b)).toBe(expected);
+    ["road", "road", 2, true],
+    ["road", "rood", 2, true],
+    ["road", "rd", 2, true],
+    ["road", "roads", 2, true],
+    ["road", "roasd", 2, true],
+    ["road", "street", 2, false],
+    ["rd", "street", 2, false],
+    ["road", "rood", 1, true],
+    ["road", "rd", 1, false],
+    ["road", "rods", 1, false],
+  ])("compares %s and %s with max %i edits", (a, b, maxEdits, expected) => {
+    expect(isWithinEditDistance(a, b, maxEdits)).toBe(expected);
   });
 });

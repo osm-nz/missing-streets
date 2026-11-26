@@ -12,7 +12,7 @@ import {
   sourceDataFile,
   SourceDataStreet,
   type Region,
-  isWithinTwoEdits,
+  isWithinEditDistance,
 } from "./util";
 import { calcBBox } from "./util/calcBbox";
 
@@ -37,6 +37,9 @@ const isCloseEnough = (linzStreet: SourceDataStreet, osmStreet: OsmStreet) =>
   ) <
   10_000 + 2 * linzStreet.streetLength;
 
+// lower threshold for short names
+const getMaxEditDistance = (nameCode: string) => (nameCode.length < 12 ? 1 : 2);
+
 // prettier-ignore
 const checkIfMatches = (linzStreet: SourceDataStreet) => (osmStreet: OsmStreet) => {
   const namesMatch =
@@ -58,7 +61,12 @@ const checkIfSimilarName =
 
     const sourceNameCode = stripMacrons(linzStreet.nameCode);
     return [osmStreet.nameCode, ...(osmStreet.otherNameCodes ?? [])].some(
-      (nameCode) => isWithinTwoEdits(sourceNameCode, stripMacrons(nameCode))
+      (nameCode) =>
+        isWithinEditDistance(
+          sourceNameCode,
+          stripMacrons(nameCode),
+          getMaxEditDistance(nameCode)
+        )
     );
   };
 

@@ -53,9 +53,13 @@ export function getNameCode(name: string) {
     .replaceAll(/[^A-Za-z0-9āēīōū]/g, "");
 }
 
-// Check if names are within two edits of each other, ignoring case and diacritics
-export function isWithinTwoEdits(a: string, b: string) {
-  if (Math.abs(a.length - b.length) > 2) return false;
+/** checks if the edit-distance between two strings is within a certain threshold */
+export function isWithinEditDistance(
+  a: string,
+  b: string,
+  maxEditDistance: number
+) {
+  if (Math.abs(a.length - b.length) > maxEditDistance) return false;
 
   let previousRow = Array.from({ length: b.length + 1 }, (_, index) => index);
   for (let i = 1; i <= a.length; i++) {
@@ -71,11 +75,11 @@ export function isWithinTwoEdits(a: string, b: string) {
       rowMinimum = Math.min(rowMinimum, currentRow[j]);
     }
 
-    if (rowMinimum > 2) return false;
+    if (rowMinimum > maxEditDistance) return false;
     previousRow = currentRow;
   }
 
-  return previousRow[b.length] <= 2;
+  return previousRow[b.length] <= maxEditDistance;
 }
 
 export function processGeoJson(geometry: Geometry, region: Region) {
