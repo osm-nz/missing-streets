@@ -60,6 +60,28 @@ for (const fileName of fileNames) {
 }
 
 //
+// use last week's result for any regions that failed
+//
+for (const region of REGIONS) {
+  const { code } = region.metadata;
+  if (code in newRow.regions) continue;
+
+  try {
+    const fileName = `conflationResult-${code}.geo.json`;
+    console.warn(`no result for ${code}, republishing the old data…`);
+    const response = await fetch(`${homepage}/${fileName}`, {
+      headers: HEADERS,
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const buf = Buffer.from(await response.arrayBuffer());
+    await fs.writeFile(join(folder, fileName), buf);
+  } catch (ex) {
+    console.error(`Failed to fetch old data for ${code}`, ex);
+  }
+}
+
+//
 // add the new stats row to the existing file
 //
 const existingStats: StatsFile = await fetch(`${homepage}/${STATS_FILE_NAME}`, {
