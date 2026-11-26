@@ -252,5 +252,5 @@ export async function conflate(region: Region) {
 
   const outputFilePath = conflationResult(region);
   await fs.mkdir(dirname(outputFilePath), { recursive: true });
-  await fs.writeFile(outputFilePath, JSON.stringify(missing, null, 2));
+  await fs.writeFile(outputFilePath, JSON.stringify(missing));
 }
