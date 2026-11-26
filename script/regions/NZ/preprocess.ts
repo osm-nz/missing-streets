@@ -77,5 +77,5 @@ export async function preprocess(this: Region) {
       })
       .on("error", reject);
   });
-  await fs.writeFile(sourceDataFile(this), JSON.stringify(linzList, null, 2));
+  await fs.writeFile(sourceDataFile(this), JSON.stringify(linzList));
 }

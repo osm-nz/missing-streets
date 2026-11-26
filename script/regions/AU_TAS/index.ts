@@ -184,6 +184,6 @@ export default {
 
     console.log(`Processed ${count.toLocaleString()} roads`);
 
-    await fs.writeFile(sourceDataFile(this), JSON.stringify(out, null, 2));
+    await fs.writeFile(sourceDataFile(this), JSON.stringify(out));
   },
 } satisfies Region;

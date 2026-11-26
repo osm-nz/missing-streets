@@ -208,6 +208,6 @@ export default {
     }
 
     console.log(`Read ${i.toLocaleString()} roads`);
-    await fs.writeFile(sourceDataFile(this), JSON.stringify(out, null, 2));
+    await fs.writeFile(sourceDataFile(this), JSON.stringify(out));
   },
 } satisfies Region;
