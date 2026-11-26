@@ -13,9 +13,9 @@ import "leaflet/dist/leaflet.css";
 import { SYNC_TIME } from "./util/date";
 
 const isInIframe = window.self !== window.top;
-const skipIframeRedirect = !!new URLSearchParams(window.location.search).get(
-  "no_redirect"
-);
+const skipIframeRedirect =
+  !!new URLSearchParams(window.location.search).get("no_redirect") ||
+  window.location.hostname === "localhost";
 
 const qsRegion = new URLSearchParams(window.location.search).get("region");
 const DEFAULT_REGION =
