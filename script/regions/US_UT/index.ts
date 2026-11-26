@@ -156,8 +156,9 @@ export default {
       parser.on("data", (chunk: { value: Feature<Geometry, UtahRoad> }) => {
         const road = chunk.value;
         if (
-          road.geometry.type !== "LineString" &&
-          road.geometry.type !== "MultiLineString"
+          !road.geometry ||
+          (road.geometry.type !== "LineString" &&
+            road.geometry.type !== "MultiLineString")
         ) {
           return;
         }
