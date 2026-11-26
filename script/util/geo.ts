@@ -49,6 +49,30 @@ export function getNameCode(name: string) {
     .replace(/number /, "no ")
     .replaceAll(/[^A-Za-z0-9āēīōū]/g, "");
 }
+// Check if names are within two edits of each other, ignoring case and diacritics
+export function isWithinTwoEdits(a: string, b: string) {
+  if (Math.abs(a.length - b.length) > 2) return false;
+
+  let previousRow = Array.from({ length: b.length + 1 }, (_, index) => index);
+  for (let i = 1; i <= a.length; i++) {
+    const currentRow = [i];
+    let rowMinimum = i;
+
+    for (let j = 1; j <= b.length; j++) {
+      currentRow[j] = Math.min(
+        previousRow[j] + 1,
+        currentRow[j - 1] + 1,
+        previousRow[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+      );
+      rowMinimum = Math.min(rowMinimum, currentRow[j]);
+    }
+
+    if (rowMinimum > 2) return false;
+    previousRow = currentRow;
+  }
+
+  return previousRow[b.length] <= 2;
+}
 
 export function processGeoJson(geometry: Geometry, region: Region) {
   const lines =

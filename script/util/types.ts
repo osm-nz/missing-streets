@@ -33,6 +33,7 @@ export type Coord = [lng: number, lat: number];
 export type ConflatedStreet = {
   roadId: number;
   name: string;
+  nearMatchName?: string;
 };
 
 export interface RegionMetadata {
