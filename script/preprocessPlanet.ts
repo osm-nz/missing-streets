@@ -21,7 +21,12 @@ export async function preprocessPlanet(region: Region) {
     pbf2json
       .createReadStream({
         file: planetRawFile(region),
-        tags: ["highway"],
+        tags: [
+          "highway+name",
+          "highway+alt_name",
+          "highway+old_name",
+          "highway+not:name",
+        ],
         leveldb: "/tmp",
       })
       .pipe(
