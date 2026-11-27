@@ -32,7 +32,7 @@ export const MapHook = memo(({ region }: { region: RegionMetadata }) => {
     }, 5000);
 
     return () => clearInterval(id);
-  });
+  }, [map, region.code]);
 
   return null;
 });
